@@ -274,31 +274,23 @@ describe('locale key consistency', () => {
     }
   })
 
-  it('non-English locales translate the principal earthquake and settings copy', () => {
+  it('non-English locales translate the principal settings copy', () => {
     const translatedKeys = [
-      'earthquake.locationDescription',
-      'earthquake.fcmStatusDescription',
-      'earthquake.fcmNotConfiguredDescription',
-      'earthquake.topicSubscriptionFailedDescription',
-      'earthquake.resetRegistrationConfirm',
-      'earthquake.realtimeAlertsDescription',
-      'earthquake.realtimeNotificationPresentationDescription',
-      'earthquake.seismicNotificationPresentationDescription',
-      'earthquake.seismicNotificationsDescription',
-      'earthquake.minimumMagnitudeDescription',
-      'earthquake.maximumDistanceDescription',
-      'earthquake.realtimeTest',
-      'earthquake.seismicTest',
-      'earthquake.fullscreenAlert',
-      'earthquake.waitingTitle',
-      'earthquake.estimatedWaveArrival',
-      'earthquake.secondsRemaining',
-      'earthquake.waveArrived',
+      'app.tagline',
+      'settings.interfaceLanguageDescription',
+      'settings.timeFormatDescription',
+      'settings.startOnStartupDescription',
+      'settings.themeDescription',
+      'settings.navbarPositionDescription',
+      'settings.pageZoomDescription',
       'settings.showTrayIconDescription',
+      'settings.minimizeToTrayOnCloseDescription',
       'settings.trayUnavailable',
       'settings.checkUpdatesOnStartupDescription',
       'settings.unattendedUpdates',
       'settings.unattendedUpdatesDescription',
+      'settings.logLevelDescription',
+      'settings.logFilesDescription',
     ]
 
     for (const locale of APP_LOCALES.filter((candidate) => candidate !== 'en')) {

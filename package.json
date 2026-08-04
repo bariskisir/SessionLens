@@ -1,7 +1,7 @@
 {
-  "name": "earthquake-signal",
+  "name": "lens",
   "version": "1.4.0",
-  "description": "Earthquake Signal desktop application",
+  "description": "Lens desktop application",
   "main": "./out/main/index.js",
   "author": "bariskisir",
   "license": "MIT",
@@ -28,15 +28,12 @@
     "release": "npm run package:win && npm run package:linux"
   },
   "dependencies": {
-    "@eneris/push-receiver": "^4.3.1",
     "electron-log": "5.4.4",
-    "leaflet": "^1.9.4",
     "zod": "4.4.3"
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.5",
     "@reduxjs/toolkit": "2.12.0",
-    "@types/leaflet": "^1.9.21",
     "@types/node": "26.1.1",
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
@@ -62,8 +59,8 @@
     "node": ">=24.0.0"
   },
   "build": {
-    "appId": "com.bariskisir.earthquakesignal",
-    "productName": "Earthquake Signal",
+    "appId": "com.bariskisir.lens",
+    "productName": "Lens",
     "asar": true,
     "directories": {
       "output": "release"
@@ -91,7 +88,7 @@
           ]
         }
       ],
-      "artifactName": "earthquake-signal-${version}-windows-${arch}-setup.${ext}"
+      "artifactName": "lens-${version}-windows-${arch}-setup.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -99,13 +96,13 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Earthquake Signal"
+      "shortcutName": "Lens"
     },
     "mac": {
       "icon": "build/icon.png",
       "target": "dmg",
       "category": "public.app-category.productivity",
-      "artifactName": "Earthquake-Signal-${version}-mac-${arch}.${ext}"
+      "artifactName": "Lens-${version}-mac-${arch}.${ext}"
     },
     "linux": {
       "icon": "build/icon.png",
@@ -113,7 +110,7 @@
         "AppImage"
       ],
       "category": "Utility",
-      "artifactName": "Earthquake-Signal-${version}-linux-${arch}.${ext}"
+      "artifactName": "Lens-${version}-linux-${arch}.${ext}"
     }
   }
 }

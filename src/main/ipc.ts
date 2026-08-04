@@ -5,35 +5,21 @@
 import { app, ipcMain, shell, type BrowserWindow, type WebContents } from 'electron'
 import { IpcChannel } from '@shared/IpcChannel'
 import { APP_AUTHOR_URL } from '@shared/appInfo'
-import {
-  LOG_LEVELS,
-  type EarthquakeNotificationOpenEvent,
-  type EarthquakeReceivedEvent,
-  type EarthquakeServiceStatus,
-  type UpdateStateEvent,
-} from '@shared/types'
+import { LOG_LEVELS, type UpdateStateEvent } from '@shared/types'
 import { z } from 'zod'
 import { settingsPatchSchema } from './settingsSchema'
 import { configureStartOnLogin } from './startup'
 import type AppUpdater from './services/AppUpdater'
-import type EarthquakeService from './services/EarthquakeService'
 import type LoggerService from './services/LoggerService'
 import type StorageService from './services/StorageService'
 import type TrayService from './services/TrayService'
 
-const sessionIdSchema = z.uuid()
-const sessionRenameSchema = z.object({
-  id: z.uuid(),
-  title: z.string().trim().min(1).max(200),
-})
 const rendererLogSchema = z.object({
   level: z.enum(LOG_LEVELS),
   module: z.string().trim().min(1).max(100),
   message: z.string().trim().min(1).max(1_000),
   details: z.string().max(8_000).optional(),
 })
-const earthquakeTestKindSchema = z.enum(['realtime', 'seismic-network'])
-const earthquakeFilterSchema = z.enum(['all', '3', '4', '5'])
 
 const TRUSTED_EXTERNAL_ORIGINS = new Set(['https://github.com', APP_AUTHOR_URL])
 
@@ -42,7 +28,6 @@ interface IpcServices {
   tray: TrayService
   updater: AppUpdater
   logger: LoggerService
-  earthquake: EarthquakeService
 }
 
 /** Removes previous handlers before a replacement window is attached. */
@@ -68,15 +53,6 @@ export const registerIpc = (window: BrowserWindow, services: IpcServices): void 
   }
 
   services.updater.initialize((event: UpdateStateEvent) => send(IpcChannel.UpdateState, event))
-  services.earthquake.onStatus((status: EarthquakeServiceStatus) =>
-    send(IpcChannel.EarthquakeStatus, status),
-  )
-  services.earthquake.onEarthquake((earthquake: EarthquakeReceivedEvent) =>
-    send(IpcChannel.EarthquakeReceived, earthquake),
-  )
-  services.earthquake.onNotificationOpen((event: EarthquakeNotificationOpenEvent) =>
-    send(IpcChannel.EarthquakeNotificationOpened, event),
-  )
   window.on('maximize', () => send(IpcChannel.WindowMaximizedChanged, true))
   window.on('unmaximize', () => send(IpcChannel.WindowMaximizedChanged, false))
 
@@ -89,15 +65,10 @@ export const registerIpc = (window: BrowserWindow, services: IpcServices): void 
     }
     window.webContents.setZoomFactor(settings.pageZoom)
 
-    const sessions = await services.storage.listSessions()
-
     return {
       settings,
-      sessions,
-      currentSession: null,
       platform: process.platform,
       version: app.getVersion(),
-      earthquakeStatus: services.earthquake.getStatus(),
     }
   })
   ipcMain.handle(IpcChannel.SettingsSave, async (event, input: unknown) => {
@@ -118,26 +89,8 @@ export const registerIpc = (window: BrowserWindow, services: IpcServices): void 
     window.webContents.setZoomFactor(savedSettings.pageZoom)
     services.tray.applySettings(savedSettings)
     services.logger.setLevel(savedSettings.logLevel)
-    services.earthquake.applySettings(savedSettings)
     services.updater.applySettings(savedSettings)
     return savedSettings
-  })
-  ipcMain.handle(IpcChannel.SessionGet, async (event, input: unknown) => {
-    assertSender(event.sender)
-    return services.storage.getSession(sessionIdSchema.parse(input))
-  })
-  ipcMain.handle(IpcChannel.SessionRename, async (event, input: unknown) => {
-    assertSender(event.sender)
-    const { id, title } = sessionRenameSchema.parse(input)
-    return services.storage.renameSession(id, title)
-  })
-  ipcMain.handle(IpcChannel.SessionDelete, async (event, input: unknown) => {
-    assertSender(event.sender)
-    return services.storage.deleteSession(sessionIdSchema.parse(input))
-  })
-  ipcMain.handle(IpcChannel.SessionDeleteAll, async (event, input: unknown) => {
-    assertSender(event.sender)
-    return services.storage.deleteAllSessions(earthquakeFilterSchema.parse(input))
   })
   ipcMain.handle(IpcChannel.WindowAlwaysOnTop, (event, enabled: unknown) => {
     assertSender(event.sender)
@@ -207,21 +160,5 @@ export const registerIpc = (window: BrowserWindow, services: IpcServices): void 
   ipcMain.handle(IpcChannel.UpdatesInstall, async (event) => {
     assertSender(event.sender)
     await services.updater.quitAndInstall()
-  })
-  ipcMain.handle(IpcChannel.EarthquakeRefresh, async (event) => {
-    assertSender(event.sender)
-    return services.earthquake.refresh()
-  })
-  ipcMain.handle(IpcChannel.EarthquakeResetRegistration, async (event) => {
-    assertSender(event.sender)
-    return services.earthquake.resetRegistration()
-  })
-  ipcMain.handle(IpcChannel.EarthquakeTest, async (event, input: unknown) => {
-    assertSender(event.sender)
-    return services.earthquake.test(earthquakeTestKindSchema.parse(input))
-  })
-  ipcMain.handle(IpcChannel.EarthquakeDismissFullscreen, (event) => {
-    assertSender(event.sender)
-    services.earthquake.dismissFullscreen()
   })
 }

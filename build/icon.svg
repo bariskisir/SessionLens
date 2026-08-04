@@ -1,32 +1,15 @@
 <svg width="512" height="512" viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
   <rect width="512" height="512" rx="110" fill="#4F46E5"/>
-  <path
-    d="M82 284
-       H142
-       L168 248
-       L195 316
-       L225 168
-       L258 348
-       L291 220
-       L320 300
-       L346 266
-       H430"
-    stroke="#FFFFFF"
-    stroke-width="28"
-    stroke-linecap="round"
-    stroke-linejoin="round"
-  />
-  <path
-    d="M354 108 C383 114 406 137 412 166"
-    stroke="#FFFFFF"
-    stroke-width="17"
-    stroke-linecap="round"
-  />
-  <path
-    d="M352 143 C368 147 380 159 384 175"
-    stroke="#FFFFFF"
-    stroke-width="17"
-    stroke-linecap="round"
-  />
-  <circle cx="351" cy="181" r="10" fill="#FFFFFF"/>
+  <!-- Bar 1 — %70 -->
+  <rect x="64" y="92" width="384" height="58" rx="29" fill="#FFFFFF" opacity="0.24"/>
+  <rect x="64" y="92" width="269" height="58" rx="29" fill="#FFFFFF"/>
+  <!-- Bar 2 — %10 -->
+  <rect x="64" y="190" width="384" height="58" rx="29" fill="#FFFFFF" opacity="0.24"/>
+  <rect x="64" y="190" width="38" height="58" rx="29" fill="#FFFFFF"/>
+  <!-- Bar 3 — %45 -->
+  <rect x="64" y="288" width="384" height="58" rx="29" fill="#FFFFFF" opacity="0.24"/>
+  <rect x="64" y="288" width="173" height="58" rx="29" fill="#FFFFFF"/>
+  <!-- Bar 4 — %85 -->
+  <rect x="64" y="386" width="384" height="58" rx="29" fill="#FFFFFF" opacity="0.24"/>
+  <rect x="64" y="386" width="326" height="58" rx="29" fill="#FFFFFF"/>
 </svg>

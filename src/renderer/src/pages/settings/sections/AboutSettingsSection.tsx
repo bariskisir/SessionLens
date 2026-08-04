@@ -2,15 +2,13 @@
  * Renders application identity, author, repository, and support links.
  */
 
-import { useState } from 'react'
-import { Button, Modal, Tag } from 'antd'
-import { ExternalLink, Info } from 'lucide-react'
+import { Button } from 'antd'
+import { ExternalLink } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { APP_AUTHOR, APP_AUTHOR_URL, APP_REPO, APP_REPO_URL } from '@shared/appInfo'
 import logoUrl from '../../../../../../build/icon.svg'
 import { useDesktopActions } from '@renderer/hooks/useDesktopActions'
 import { useAppSelector } from '@renderer/store'
-import HowItWorksContent from '../components/HowItWorksContent'
 import SettingLabel from '../components/SettingLabel'
 import styles from '../SettingsPage.module.scss'
 
@@ -19,7 +17,6 @@ const AboutSettingsSection = (): React.JSX.Element => {
   const version = useAppSelector((state) => state.app.version)
   const desktopActions = useDesktopActions()
   const { t } = useTranslation()
-  const [howOpen, setHowOpen] = useState(false)
 
   return (
     <div className={styles.settingContainer}>
@@ -27,7 +24,6 @@ const AboutSettingsSection = (): React.JSX.Element => {
         <img src={logoUrl} alt="" />
         <h2>{t('app.name')}</h2>
         <p>{t('app.tagline')}</p>
-        <Tag>v{version}</Tag>
       </div>
       <section className={styles.settingGroup}>
         <div className={styles.settingRow}>
@@ -47,21 +43,9 @@ const AboutSettingsSection = (): React.JSX.Element => {
           />
         </div>
         <div className={styles.settingRow}>
-          <Button icon={<Info size={14} />} onClick={() => setHowOpen(true)}>
-            {t('about.howItWorks')}
-          </Button>
+          <SettingLabel title={t('settings.version')} description={`v${version}`} />
         </div>
       </section>
-      <Modal
-        title={t('about.howItWorksTitle')}
-        open={howOpen}
-        onCancel={() => setHowOpen(false)}
-        footer={null}
-        width={560}
-        destroyOnHidden
-      >
-        <HowItWorksContent />
-      </Modal>
     </div>
   )
 }

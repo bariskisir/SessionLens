@@ -34,13 +34,6 @@ describe('IpcChannel', () => {
     expect(channels).toContain('settings:save')
   })
 
-  it('includes the required session channels', () => {
-    expect(channels).toContain('session:get')
-    expect(channels).toContain('session:rename')
-    expect(channels).toContain('session:delete')
-    expect(channels).toContain('session:delete-all')
-  })
-
   it('includes the required window channels', () => {
     expect(channels).toContain('window:always-on-top')
     expect(channels).toContain('window:minimize')
@@ -71,14 +64,5 @@ describe('IpcChannel', () => {
   it('includes the required update and navigation events', () => {
     expect(channels).toContain('event:update-state')
     expect(channels).toContain('event:settings-open-requested')
-  })
-
-  it('includes the earthquake receiver channels', () => {
-    expect(channels).toContain('earthquake:refresh')
-    expect(channels).toContain('earthquake:reset-registration')
-    expect(channels).toContain('earthquake:test')
-    expect(channels).toContain('earthquake:dismiss-fullscreen')
-    expect(channels).toContain('event:earthquake-status')
-    expect(channels).toContain('event:earthquake-received')
   })
 })

@@ -70,7 +70,7 @@ export default class TrayService {
       const trayImage =
         process.platform === 'win32' ? sourceImage : sourceImage.resize({ width: 16, height: 16 })
       const tray = new Tray(trayImage)
-      tray.setToolTip('Earthquake Signal')
+      tray.setToolTip('Lens')
       tray.setContextMenu(
         Menu.buildFromTemplate([
           { label: 'Open', click: () => this.showWindow() },

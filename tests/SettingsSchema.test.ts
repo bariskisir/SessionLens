@@ -41,50 +41,19 @@ describe('parsePersistedSettings', () => {
     expect(parsePersistedSettings(olderSettings).unattendedUpdates).toBe(true)
   })
 
-  it('migrates revision 1 settings with Ankara earthquake defaults', () => {
-    const result = parsePersistedSettings({ settingsRevision: 1, theme: 'dark' })
-    expect(result).toMatchObject({
-      settingsRevision: 3,
-      theme: 'dark',
-      earthquakeLatitude: 40,
-      earthquakeLongitude: 32,
-      fcmCheckIntervalMinutes: 480,
-      realtimeNotificationPresentation: 'fullscreen',
-      seismicNotificationPresentation: 'normal',
-    })
-  })
-
-  it('migrates the previous seismic notification defaults', () => {
-    const result = parsePersistedSettings({
-      ...DEFAULT_SETTINGS,
-      settingsRevision: 2,
-      seismicMinimumMagnitude: 3,
-      seismicMaximumDistanceKm: 500,
-    })
-    expect(result).toMatchObject({
-      settingsRevision: 3,
-      seismicMinimumMagnitude: 4,
-      seismicMaximumDistanceKm: 1_000,
-    })
-  })
-
   it('drops obsolete feature settings', () => {
     const result = parsePersistedSettings({
       ...DEFAULT_SETTINGS,
       removedProvider: 'legacy',
       removedFeatureEnabled: true,
-      realtimeTextToSpeech: true,
-      seismicTextToSpeech: true,
-      seismicTextToSpeechMinimumMagnitude: 4,
-      seismicNotificationFilter: 'relevant',
+      earthquakeLatitude: 40,
+      realtimeAlertsEnabled: true,
     })
     expect(result).toEqual(DEFAULT_SETTINGS)
     expect(result).not.toHaveProperty('removedProvider')
     expect(result).not.toHaveProperty('removedFeatureEnabled')
-    expect(result).not.toHaveProperty('realtimeTextToSpeech')
-    expect(result).not.toHaveProperty('seismicTextToSpeech')
-    expect(result).not.toHaveProperty('seismicTextToSpeechMinimumMagnitude')
-    expect(result).not.toHaveProperty('seismicNotificationFilter')
+    expect(result).not.toHaveProperty('earthquakeLatitude')
+    expect(result).not.toHaveProperty('realtimeAlertsEnabled')
   })
 
   it('falls back safely when a generic preference is invalid', () => {
@@ -104,15 +73,6 @@ describe('settingsSchema', () => {
       minimizeToTrayOnClose: true,
     })
     expect(result.success).toBe(false)
-  })
-
-  it('validates the minute-based FCM interval and earthquake coordinates', () => {
-    expect(
-      settingsSchema.safeParse({ ...DEFAULT_SETTINGS, fcmCheckIntervalMinutes: 0 }).success,
-    ).toBe(false)
-    expect(settingsSchema.safeParse({ ...DEFAULT_SETTINGS, earthquakeLatitude: 91 }).success).toBe(
-      false,
-    )
   })
 })
 

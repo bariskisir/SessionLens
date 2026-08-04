@@ -3,133 +3,15 @@
  */
 
 const ru = {
-  earthquake: {
-    title: 'Землетрясение',
-    locationGroup: 'Местоположение и FCM',
-    location: 'Местоположение',
-    locationDescription: 'Выберите на карте постоянное местоположение для уведомлений.',
-    latitude: 'Широта',
-    longitude: 'Долгота',
-    saveLocation: 'Сохранить местоположение',
-    topics: 'Желаемые темы',
-    subscribedTopics: 'Подписанные каналы FCM',
-    noSubscribedTopics: 'Подписка ни на одну тему пока не подтверждена.',
-    fcmStatus: 'Состояние FCM',
-    fcmStatusDescription:
-      'При запуске получается токен, а соединение проверяется с указанным интервалом.',
-    fcmNotConfiguredDescription: 'Нет доступной авторизованной конфигурации клиента Firebase.',
-    topicSubscriptionFailedDescription:
-      'Транспорт подключён, но подписку на темы Firebase подтвердить не удалось.',
-    checkInterval: 'Интервал проверки FCM',
-    checkIntervalDescription:
-      'Хранится и планируется в минутах. Мобильное значение по умолчанию — 8 часов (480 минут).',
-    minutes: 'минуты',
-    checkNow: 'Проверить сейчас',
-    token: 'Токен FCM',
-    backendUserId: 'ID устройства Earthquake Network',
-    backendRegistration: 'Регистрация на сервере',
-    tileRegistration: 'Регистрация зоны',
-    locationSynchronization: 'Синхронизация местоположения',
-    topicMembership: 'Подписка на темы Firebase',
-    confirmed: 'Подтверждено',
-    notConfirmed: 'Не подтверждено',
-    firebaseInstallationId: 'ID установки Firebase',
-    gcmAndroidId: 'Android ID GCM',
-    gcmAppId: 'ID приложения GCM',
-    firebaseProjectId: 'ID проекта Firebase',
-    packageId: 'ID пакета',
-    installationCreated: 'Установка создана',
-    authTokenExpires: 'Срок действия токена авторизации',
-    persistentMessageCount: 'Сохранённые ID сообщений',
-    lastCheck: 'Последняя проверка',
-    nextCheck: 'Следующая проверка',
-    resetRegistration: 'Сбросить регистрацию',
-    resetRegistrationConfirm:
-      'Удалить текущую учётную запись FCM и создать совершенно новую регистрацию?',
-    resetRegistrationComplete: 'Создана новая регистрация FCM.',
-    states: {
-      'not-configured': 'Не настроено',
-      connecting: 'Подключение',
-      connected: 'Подключено',
-      disconnected: 'Отключено',
-      error: 'Ошибка',
-    },
-    realtimeGroup: 'Оповещение в реальном времени',
-    realtimeAlerts: 'Оповещения в реальном времени',
-    realtimeAlertsDescription:
-      'Показывать мгновенные оповещения при расчётной локальной интенсивности от 1,5.',
-    silentWhenMild: 'Без звука при слабой интенсивности',
-    silentWhenMildDescription:
-      'Не воспроизводить сигнал тревоги при расчётной интенсивности ниже 3.',
-    notificationPresentation: 'Тип уведомления',
-    realtimeNotificationPresentationDescription:
-      'Сильные оповещения в реальном времени используют этот тип; слабые остаются обычными.',
-    seismicNotificationPresentationDescription:
-      'Выберите способ отображения подходящих отчётов сейсмических сетей.',
-    presentations: { fullscreen: 'Во весь экран', normal: 'Обычное' },
-    seismicGroup: 'Уведомление сейсмической сети',
-    seismicNotifications: 'Уведомления сейсмической сети',
-    seismicNotificationsDescription:
-      'Показывать уведомления для обычных сетевых отчётов о землетрясениях.',
-    minimumMagnitude: 'Минимальная магнитуда',
-    minimumMagnitudeDescription: 'Уведомлять о землетрясениях с этой магнитудой и выше.',
-    maximumDistance: 'Максимальное расстояние',
-    maximumDistanceDescription:
-      'Уведомлять о землетрясениях в пределах этого расстояния от вашего местоположения.',
-    kilometres: 'км',
-    testGroup: 'Тест',
-    realtimeTest: 'Проверить оповещение в реальном времени',
-    seismicTest: 'Проверить сейсмическую сеть',
-    testCreated: 'Тестовое землетрясение создано.',
-    fullscreenAlert: 'Оповещение о землетрясении',
-    waitingTitle: 'Ожидание сигналов о землетрясениях',
-    realtimeBadge: 'В реальном времени',
-    seismicBadge: 'Сейсмическая сеть',
-    magnitude: 'Магнитуда',
-    intensity: 'Расчётная интенсивность',
-    intensityLabels: {
-      mild: 'Слабая',
-      moderate: 'Умеренная',
-      strong: 'Сильная',
-      'very-strong': 'Очень сильная',
-      severe: 'Разрушительная',
-    },
-    distance: 'Расстояние',
-    depth: 'Глубина',
-    coordinates: 'Координаты',
-    occurred: 'Произошло',
-    received: 'Получено',
-    source: 'Источник',
-    yourLocation: 'Вы',
-    earthquakeCenter: 'Землетрясение',
-    estimatedWaveArrival: 'Расчётное прибытие волны',
-    secondsRemaining: 'Осталось {{count}} с',
-    waveArrived: 'Волна прибыла',
-  },
   app: {
-    name: 'Earthquake Signal',
-    tagline: 'Сигналы землетрясений в реальном времени.',
+    name: 'Lens',
+    tagline: 'Сфокусированная оболочка настольного приложения.',
   },
   common: {
     loading: 'Загрузка…',
-    delete: 'Удалить',
-    rename: 'Переименовать',
-    cancel: 'Отмена',
   },
   nav: {
-    sessions: 'Землетрясения',
     settings: 'Настройки',
-  },
-  sidebar: {
-    hideSidebar: 'Скрыть землетрясения',
-    showSidebar: 'Показать землетрясения',
-  },
-  sessions: {
-    all: 'Все',
-    newSession: 'Новое землетрясение',
-    renameSession: 'Переименовать землетрясение',
-    deleteAll: 'Удалить все землетрясения',
-    emptyTitle: 'Землетрясений пока нет',
   },
   windowControls: {
     minimize: 'Свернуть',
@@ -149,7 +31,7 @@ const ru = {
     timeFormat: 'Формат времени',
     timeFormatDescription: 'Выберите 12-часовой или 24-часовой формат.',
     startOnStartup: 'Запускать при входе',
-    startOnStartupDescription: 'Автоматически запускать Earthquake Signal при входе в систему.',
+    startOnStartupDescription: 'Автоматически запускать Lens при входе в систему.',
     timeFormats: {
       '24-hour': '24-часовой',
       '12-hour': '12-часовой',
@@ -171,7 +53,7 @@ const ru = {
     resetZoom: 'Сбросить масштаб',
     traySettings: 'Настройки системного трея',
     showTrayIcon: 'Показывать значок в трее',
-    showTrayIconDescription: 'Показывать Earthquake Signal в системном трее.',
+    showTrayIconDescription: 'Показывать Lens в системном трее.',
     minimizeToTrayOnClose: 'Сворачивать в трей при закрытии',
     minimizeToTrayOnCloseDescription:
       'Скрывать окно в системном трее вместо выхода из приложения при закрытии.',
@@ -179,7 +61,7 @@ const ru = {
     alwaysOnTop: 'Поверх всех окон',
     checkUpdatesOnStartup: 'Проверять обновления при запуске',
     checkUpdatesOnStartupDescription:
-      'Автоматически проверять GitHub Releases при запуске приложения.',
+      'При запуске приложения автоматически проверять новую версию Lens на GitHub.',
     unattendedUpdates: 'Автоматические обновления без участия пользователя',
     unattendedUpdatesDescription:
       'Загружать обновления в фоновом режиме, устанавливать их без запросов и автоматически перезапускать приложение.',
@@ -228,24 +110,6 @@ const ru = {
   },
   errors: {
     generic: 'Что-то пошло не так.',
-  },
-  about: {
-    howItWorks: 'Как это работает',
-    howItWorksTitle: 'Как работает Earthquake Signal',
-    howItWorksIntro:
-      'Earthquake Signal — это настольная версия мобильного приложения Earthquake Network. Получает те же оповещения о землетрясениях — телефон не нужен.',
-    howItWorksSteps: {
-      step1: 'Выберите своё местоположение на карте — укажите, где хотите получать оповещения.',
-      step2: 'Приложение регистрирует ваше местоположение на сервере Earthquake Network.',
-      step3:
-        'Подписывается на два канала оповещений: Global (весь мир) и ваша локальная зона 10×10 градусов вокруг местоположения.',
-      step4:
-        'Когда сейсмические станции обнаруживают землетрясение, push-сообщение мгновенно доставляется с сервера Earthquake Network через Firebase на ваш компьютер.',
-      step5:
-        'Землетрясение отображается на вашей карте. Вы видите магнитуду, расчётную интенсивность, расстояние и глубину.',
-      step6:
-        'Все данные о землетрясениях хранятся на вашем компьютере. Без аккаунта, без личных данных — передаются только ваши координаты и случайный идентификатор устройства.',
-    },
   },
 } as const
 

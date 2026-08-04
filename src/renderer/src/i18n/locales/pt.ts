@@ -3,132 +3,15 @@
  */
 
 const pt = {
-  earthquake: {
-    title: 'Sismo',
-    locationGroup: 'Localização e FCM',
-    location: 'Localização',
-    locationDescription: 'Selecione no mapa a sua localização fixa para notificações.',
-    latitude: 'Latitude',
-    longitude: 'Longitude',
-    saveLocation: 'Guardar localização',
-    topics: 'Tópicos pretendidos',
-    subscribedTopics: 'Canais FCM subscritos',
-    noSubscribedTopics: 'Ainda não foi confirmada nenhuma subscrição de tópico.',
-    fcmStatus: 'Estado do FCM',
-    fcmStatusDescription:
-      'É obtido um token ao iniciar e a ligação é verificada com este intervalo.',
-    fcmNotConfiguredDescription:
-      'Não está disponível nenhuma configuração autorizada do cliente Firebase.',
-    topicSubscriptionFailedDescription:
-      'O transporte está ligado, mas não foi possível confirmar a subscrição dos tópicos Firebase.',
-    checkInterval: 'Intervalo de verificação do FCM',
-    checkIntervalDescription:
-      'Guardado e agendado em minutos. A predefinição móvel é de 8 horas (480 minutos).',
-    minutes: 'minutos',
-    checkNow: 'Verificar agora',
-    token: 'Token FCM',
-    backendUserId: 'ID de dispositivo do Earthquake Network',
-    backendRegistration: 'Registo no servidor',
-    tileRegistration: 'Registo da zona',
-    locationSynchronization: 'Sincronização da localização',
-    topicMembership: 'Subscrição de tópicos Firebase',
-    confirmed: 'Confirmado',
-    notConfirmed: 'Não confirmado',
-    firebaseInstallationId: 'ID de instalação do Firebase',
-    gcmAndroidId: 'ID Android do GCM',
-    gcmAppId: 'ID da aplicação GCM',
-    firebaseProjectId: 'ID do projeto Firebase',
-    packageId: 'ID do pacote',
-    installationCreated: 'Instalação criada',
-    authTokenExpires: 'Validade do token de autenticação',
-    persistentMessageCount: 'IDs de mensagens guardadas',
-    lastCheck: 'Última verificação',
-    nextCheck: 'Próxima verificação',
-    resetRegistration: 'Repor registo',
-    resetRegistrationConfirm:
-      'Eliminar a identidade FCM atual e criar um registo completamente novo?',
-    resetRegistrationComplete: 'Foi criado um novo registo FCM.',
-    states: {
-      'not-configured': 'Não configurado',
-      connecting: 'A ligar',
-      connected: 'Ligado',
-      disconnected: 'Desligado',
-      error: 'Erro',
-    },
-    realtimeGroup: 'Alerta em tempo real',
-    realtimeAlerts: 'Alertas em tempo real',
-    realtimeAlertsDescription:
-      'Mostrar alertas imediatos para uma intensidade local estimada de 1,5 ou superior.',
-    silentWhenMild: 'Silencioso quando fraco',
-    silentWhenMildDescription: 'Não tocar o alarme abaixo de uma intensidade estimada de 3.',
-    notificationPresentation: 'Tipo de notificação',
-    realtimeNotificationPresentationDescription:
-      'Os alertas fortes em tempo real usam este tipo; os fracos permanecem normais.',
-    seismicNotificationPresentationDescription:
-      'Escolha como são apresentados os relatórios correspondentes das redes sísmicas.',
-    presentations: { fullscreen: 'Ecrã inteiro', normal: 'Normal' },
-    seismicGroup: 'Notificação da rede sísmica',
-    seismicNotifications: 'Notificações da rede sísmica',
-    seismicNotificationsDescription:
-      'Mostrar notificações para relatórios regulares de sismos da rede.',
-    minimumMagnitude: 'Magnitude mínima',
-    minimumMagnitudeDescription: 'Notificar sismos com esta magnitude ou superior.',
-    maximumDistance: 'Distância máxima',
-    maximumDistanceDescription: 'Notificar sismos dentro desta distância da sua localização.',
-    kilometres: 'km',
-    testGroup: 'Teste',
-    realtimeTest: 'Testar alerta em tempo real',
-    seismicTest: 'Testar rede sísmica',
-    testCreated: 'Sismo de teste criado.',
-    fullscreenAlert: 'Alerta de sismo',
-    waitingTitle: 'A aguardar sinais sísmicos',
-    realtimeBadge: 'Tempo real',
-    seismicBadge: 'Rede sísmica',
-    magnitude: 'Magnitude',
-    intensity: 'Intensidade estimada',
-    intensityLabels: {
-      mild: 'Fraca',
-      moderate: 'Moderada',
-      strong: 'Forte',
-      'very-strong': 'Muito forte',
-      severe: 'Severa',
-    },
-    distance: 'Distância',
-    depth: 'Profundidade',
-    coordinates: 'Coordenadas',
-    occurred: 'Ocorrido',
-    received: 'Recebido',
-    source: 'Fonte',
-    yourLocation: 'Você',
-    earthquakeCenter: 'Sismo',
-    estimatedWaveArrival: 'Chegada estimada da onda',
-    secondsRemaining: 'Faltam {{count}} s',
-    waveArrived: 'A onda chegou',
-  },
   app: {
-    name: 'Earthquake Signal',
-    tagline: 'Sinais sísmicos em tempo real.',
+    name: 'Lens',
+    tagline: 'Uma interface de aplicação de secretária focada.',
   },
   common: {
     loading: 'A carregar…',
-    delete: 'Eliminar',
-    rename: 'Renomear',
-    cancel: 'Cancelar',
   },
   nav: {
-    sessions: 'Sismos',
     settings: 'Definições',
-  },
-  sidebar: {
-    hideSidebar: 'Ocultar sismos',
-    showSidebar: 'Mostrar sismos',
-  },
-  sessions: {
-    all: 'Todos',
-    newSession: 'Novo sismo',
-    renameSession: 'Renomear sismo',
-    deleteAll: 'Eliminar todos os sismos',
-    emptyTitle: 'Ainda não há sismos',
   },
   windowControls: {
     minimize: 'Minimizar',
@@ -148,7 +31,7 @@ const pt = {
     timeFormat: 'Formato da hora',
     timeFormatDescription: 'Escolha entre o relógio de 24 ou 12 horas.',
     startOnStartup: 'Iniciar no arranque',
-    startOnStartupDescription: 'Iniciar o Earthquake Signal automaticamente ao iniciar sessão.',
+    startOnStartupDescription: 'Iniciar o Lens automaticamente ao iniciar sessão.',
     timeFormats: {
       '24-hour': '24 horas',
       '12-hour': '12 horas',
@@ -170,7 +53,7 @@ const pt = {
     resetZoom: 'Repor zoom',
     traySettings: 'Definições da área de notificação',
     showTrayIcon: 'Mostrar ícone na área de notificação',
-    showTrayIconDescription: 'Mostrar o Earthquake Signal na área de notificação.',
+    showTrayIconDescription: 'Mostrar o Lens na área de notificação.',
     minimizeToTrayOnClose: 'Minimizar para a área de notificação ao fechar',
     minimizeToTrayOnCloseDescription:
       'Oculte a janela na área de notificação em vez de sair ao fechá-la.',
@@ -178,7 +61,7 @@ const pt = {
     alwaysOnTop: 'Sempre visível',
     checkUpdatesOnStartup: 'Procurar atualizações ao iniciar',
     checkUpdatesOnStartupDescription:
-      'Procurar no GitHub uma nova versão do Earthquake Signal ao iniciar a aplicação.',
+      'Procurar no GitHub uma nova versão do Lens ao iniciar a aplicação.',
     unattendedUpdates: 'Atualizações automáticas sem supervisão',
     unattendedUpdatesDescription:
       'Transferir atualizações em segundo plano, instalá-las silenciosamente e reiniciar sem pedir confirmação.',
@@ -224,24 +107,6 @@ const pt = {
     system: 'Sistema',
     light: 'Claro',
     dark: 'Escuro',
-  },
-  about: {
-    howItWorks: 'Como funciona',
-    howItWorksTitle: 'Como funciona o Earthquake Signal',
-    howItWorksIntro:
-      'O Earthquake Signal é a versão desktop da aplicação móvel Earthquake Network. Recebe os mesmos alertas sísmicos — sem necessidade de telemóvel.',
-    howItWorksSteps: {
-      step1: 'Escolha a sua localização no mapa — defina onde quer ser notificado.',
-      step2: 'A aplicação regista a sua localização no servidor Earthquake Network.',
-      step3:
-        'Subscreve dois canais de alerta: Global (mundial) e a sua zona local de 10×10 graus ao redor da sua localização.',
-      step4:
-        'Quando as estações sísmicas detetam um sismo, uma mensagem push viaja do servidor Earthquake Network através do Firebase até ao seu computador em segundos.',
-      step5:
-        'O sismo aparece no seu mapa. Vê a magnitude, intensidade estimada, distância e profundidade.',
-      step6:
-        'Todos os dados sísmicos são armazenados no seu computador. Sem conta, sem informações pessoais — apenas as suas coordenadas e um identificador de dispositivo aleatório são partilhados.',
-    },
   },
   errors: {
     generic: 'Ocorreu um erro.',

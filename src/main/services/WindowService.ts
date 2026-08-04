@@ -48,7 +48,7 @@ export default class WindowService {
       minHeight: 300,
       show: false,
       backgroundColor: '#181818',
-      title: 'Earthquake Signal',
+      title: 'Lens',
       ...(process.platform === 'darwin'
         ? {
             titleBarStyle: 'hidden' as const,

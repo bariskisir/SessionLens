@@ -3,7 +3,6 @@
  */
 
 import './assets/styles/index.scss'
-import 'leaflet/dist/leaflet.css'
 
 import { App as AntdApp } from 'antd'
 import { createRoot } from 'react-dom/client'

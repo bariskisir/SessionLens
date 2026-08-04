@@ -3,134 +3,15 @@
  */
 
 const es = {
-  earthquake: {
-    title: 'Terremoto',
-    locationGroup: 'Ubicación y FCM',
-    location: 'Ubicación',
-    locationDescription: 'Selecciona en el mapa tu ubicación fija para las notificaciones.',
-    latitude: 'Latitud',
-    longitude: 'Longitud',
-    saveLocation: 'Guardar ubicación',
-    topics: 'Temas deseados',
-    subscribedTopics: 'Canales FCM suscritos',
-    noSubscribedTopics: 'Todavía no se ha confirmado ninguna suscripción a temas.',
-    fcmStatus: 'Estado de FCM',
-    fcmStatusDescription:
-      'Al iniciar se obtiene un token y la conexión se comprueba con este intervalo.',
-    fcmNotConfiguredDescription:
-      'No hay disponible ninguna configuración autorizada del cliente de Firebase.',
-    topicSubscriptionFailedDescription:
-      'El transporte está conectado, pero no se pudo confirmar la suscripción a temas de Firebase.',
-    checkInterval: 'Intervalo de comprobación de FCM',
-    checkIntervalDescription:
-      'Se guarda y programa en minutos. El valor predeterminado móvil es de 8 horas (480 minutos).',
-    minutes: 'minutos',
-    checkNow: 'Comprobar ahora',
-    token: 'Token de FCM',
-    backendUserId: 'ID de dispositivo de Earthquake Network',
-    backendRegistration: 'Registro en el servidor',
-    tileRegistration: 'Registro de zona',
-    locationSynchronization: 'Sincronización de ubicación',
-    topicMembership: 'Suscripción a temas de Firebase',
-    confirmed: 'Confirmado',
-    notConfirmed: 'Sin confirmar',
-    firebaseInstallationId: 'ID de instalación de Firebase',
-    gcmAndroidId: 'ID de Android de GCM',
-    gcmAppId: 'ID de aplicación de GCM',
-    firebaseProjectId: 'ID de proyecto de Firebase',
-    packageId: 'ID de paquete',
-    installationCreated: 'Instalación creada',
-    authTokenExpires: 'Caducidad del token de autenticación',
-    persistentMessageCount: 'ID de mensajes guardados',
-    lastCheck: 'Última comprobación',
-    nextCheck: 'Próxima comprobación',
-    resetRegistration: 'Restablecer registro',
-    resetRegistrationConfirm:
-      '¿Quieres eliminar la identidad FCM actual y crear un registro completamente nuevo?',
-    resetRegistrationComplete: 'Se ha creado un nuevo registro FCM.',
-    states: {
-      'not-configured': 'Sin configurar',
-      connecting: 'Conectando',
-      connected: 'Conectado',
-      disconnected: 'Desconectado',
-      error: 'Error',
-    },
-    realtimeGroup: 'Alerta en tiempo real',
-    realtimeAlerts: 'Alertas en tiempo real',
-    realtimeAlertsDescription:
-      'Mostrar alertas inmediatas para una intensidad local estimada de 1,5 o superior.',
-    silentWhenMild: 'Silencio si es leve',
-    silentWhenMildDescription:
-      'No reproducir la alarma por debajo de una intensidad estimada de 3.',
-    notificationPresentation: 'Tipo de notificación',
-    realtimeNotificationPresentationDescription:
-      'Las alertas intensas en tiempo real usan este tipo; las leves se mantienen normales.',
-    seismicNotificationPresentationDescription:
-      'Elige cómo se muestran los informes coincidentes de las redes sísmicas.',
-    presentations: { fullscreen: 'Pantalla completa', normal: 'Normal' },
-    seismicGroup: 'Notificación de la red sísmica',
-    seismicNotifications: 'Notificaciones de la red sísmica',
-    seismicNotificationsDescription:
-      'Mostrar notificaciones para informes habituales de terremotos de la red.',
-    minimumMagnitude: 'Magnitud mínima',
-    minimumMagnitudeDescription: 'Notificar terremotos con esta magnitud o superior.',
-    maximumDistance: 'Distancia máxima',
-    maximumDistanceDescription:
-      'Notificar terremotos situados dentro de esta distancia de tu ubicación.',
-    kilometres: 'km',
-    testGroup: 'Prueba',
-    realtimeTest: 'Probar alerta en tiempo real',
-    seismicTest: 'Probar red sísmica',
-    testCreated: 'Terremoto de prueba creado.',
-    fullscreenAlert: 'Alerta de terremoto',
-    waitingTitle: 'Esperando señales de terremotos',
-    realtimeBadge: 'Tiempo real',
-    seismicBadge: 'Red sísmica',
-    magnitude: 'Magnitud',
-    intensity: 'Intensidad estimada',
-    intensityLabels: {
-      mild: 'Leve',
-      moderate: 'Moderada',
-      strong: 'Fuerte',
-      'very-strong': 'Muy fuerte',
-      severe: 'Severa',
-    },
-    distance: 'Distancia',
-    depth: 'Profundidad',
-    coordinates: 'Coordenadas',
-    occurred: 'Ocurrió',
-    received: 'Recibido',
-    source: 'Fuente',
-    yourLocation: 'Tú',
-    earthquakeCenter: 'Terremoto',
-    estimatedWaveArrival: 'Llegada estimada de la onda',
-    secondsRemaining: 'Quedan {{count}} s',
-    waveArrived: 'La onda ha llegado',
-  },
   app: {
-    name: 'Earthquake Signal',
-    tagline: 'Señales sísmicas en tiempo real.',
+    name: 'Lens',
+    tagline: 'Un envoltorio de aplicación de escritorio enfocado.',
   },
   common: {
     loading: 'Cargando…',
-    delete: 'Eliminar',
-    rename: 'Cambiar nombre',
-    cancel: 'Cancelar',
   },
   nav: {
-    sessions: 'Terremotos',
     settings: 'Ajustes',
-  },
-  sidebar: {
-    hideSidebar: 'Ocultar terremotos',
-    showSidebar: 'Mostrar terremotos',
-  },
-  sessions: {
-    all: 'Todos',
-    newSession: 'Nuevo terremoto',
-    renameSession: 'Cambiar nombre del terremoto',
-    deleteAll: 'Eliminar todos los terremotos',
-    emptyTitle: 'Aún no hay terremotos',
   },
   windowControls: {
     minimize: 'Minimizar',
@@ -150,7 +31,7 @@ const es = {
     timeFormat: 'Formato de hora',
     timeFormatDescription: 'Elige entre el formato de 24 o 12 horas.',
     startOnStartup: 'Iniciar al arrancar',
-    startOnStartupDescription: 'Inicia Earthquake Signal automáticamente al iniciar sesión.',
+    startOnStartupDescription: 'Inicia Lens automáticamente al iniciar sesión.',
     timeFormats: {
       '24-hour': '24 horas',
       '12-hour': '12 horas',
@@ -172,7 +53,7 @@ const es = {
     resetZoom: 'Restablecer zoom',
     traySettings: 'Configuración de la bandeja',
     showTrayIcon: 'Mostrar icono en la bandeja',
-    showTrayIconDescription: 'Mostrar Earthquake Signal en la bandeja del sistema.',
+    showTrayIconDescription: 'Mostrar Lens en la bandeja del sistema.',
     minimizeToTrayOnClose: 'Minimizar a la bandeja al cerrar',
     minimizeToTrayOnCloseDescription:
       'Oculta la ventana en la bandeja del sistema en lugar de salir al cerrarla.',
@@ -180,7 +61,7 @@ const es = {
     alwaysOnTop: 'Siempre visible',
     checkUpdatesOnStartup: 'Buscar actualizaciones al iniciar',
     checkUpdatesOnStartupDescription:
-      'Buscar en GitHub una nueva versión de Earthquake Signal al iniciar la aplicación.',
+      'Buscar en GitHub una nueva versión de Lens al iniciar la aplicación.',
     unattendedUpdates: 'Actualizaciones automáticas desatendidas',
     unattendedUpdatesDescription:
       'Descargar actualizaciones en segundo plano, instalarlas silenciosamente y reiniciar sin pedir confirmación.',
@@ -229,24 +110,6 @@ const es = {
   },
   errors: {
     generic: 'Algo salió mal.',
-  },
-  about: {
-    howItWorks: 'Cómo funciona',
-    howItWorksTitle: 'Cómo funciona Earthquake Signal',
-    howItWorksIntro:
-      'Earthquake Signal es la versión de escritorio de la aplicación móvil Earthquake Network. Recibe las mismas alertas sísmicas — sin necesidad de teléfono.',
-    howItWorksSteps: {
-      step1: 'Elige tu ubicación en el mapa — define dónde quieres recibir notificaciones.',
-      step2: 'La aplicación registra tu ubicación en el servidor Earthquake Network.',
-      step3:
-        'Se suscribe a dos canales de alerta: Global (todo el mundo) y tu zona local de 10×10 grados alrededor de tu ubicación.',
-      step4:
-        'Cuando las estaciones sísmicas detectan un terremoto, un mensaje push viaja desde el servidor Earthquake Network a través de Firebase hasta tu ordenador en segundos.',
-      step5:
-        'El terremoto aparece en tu mapa. Ves la magnitud, la intensidad estimada, la distancia y la profundidad.',
-      step6:
-        'Todos los datos sísmicos se almacenan en tu ordenador. Sin cuenta, sin información personal — solo tus coordenadas y un identificador de dispositivo aleatorio se comparten.',
-    },
   },
 } as const
 

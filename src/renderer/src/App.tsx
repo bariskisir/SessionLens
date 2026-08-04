@@ -1,5 +1,5 @@
 /**
- * Composes the reusable desktop shell, workspace, settings, and update notice.
+ * Composes the reusable desktop shell, settings, and update notice.
  */
 
 import { lazy, Suspense } from 'react'
@@ -9,12 +9,10 @@ import { useTranslation } from 'react-i18next'
 import logoUrl from '../../../build/icon.svg'
 import styles from './App.module.scss'
 import AppSidebar from '@renderer/components/app/AppSidebar'
-import FullscreenEarthquakeAlert from '@renderer/components/app/FullscreenEarthquakeAlert'
 import Titlebar from '@renderer/components/app/Titlebar'
 import { useAppInit } from '@renderer/hooks/useAppInit'
 import { useDesktopActions } from '@renderer/hooks/useDesktopActions'
 import { useSettingsActions } from '@renderer/hooks/useSettingsActions'
-import HomePage from '@renderer/pages/home/HomePage'
 import { useAppSelector } from '@renderer/store'
 
 const SettingsPage = lazy(() => import('@renderer/pages/settings/SettingsPage'))
@@ -22,11 +20,10 @@ const SettingsPage = lazy(() => import('@renderer/pages/settings/SettingsPage'))
 const showUpdateNotice = (update: { state: string; pageUrl?: string }) =>
   update.state === 'downloaded' || (update.state === 'available' && update.pageUrl !== undefined)
 
-/** Renders application pages after main-process bootstrap completes. */
+/** Renders application settings after main-process bootstrap completes. */
 const App = (): React.JSX.Element => {
   useAppInit()
   const initialized = useAppSelector((state) => state.app.initialized)
-  const page = useAppSelector((state) => state.app.page)
   const navbarPosition = useAppSelector((state) => state.app.settings.navbarPosition)
   const update = useAppSelector((state) => state.app.update)
   const desktopActions = useDesktopActions()
@@ -50,13 +47,9 @@ const App = (): React.JSX.Element => {
           <AppSidebar onSettingsChange={settingsActions.saveSettings} />
         )}
         <div className={styles.workspace}>
-          {page === 'home' ? (
-            <HomePage />
-          ) : (
-            <Suspense fallback={<Spin className={styles.pageSpinner ?? ''} size="small" />}>
-              <SettingsPage />
-            </Suspense>
-          )}
+          <Suspense fallback={<Spin className={styles.pageSpinner ?? ''} size="small" />}>
+            <SettingsPage />
+          </Suspense>
         </div>
       </div>
       {showUpdateNotice(update) && (
@@ -82,7 +75,6 @@ const App = (): React.JSX.Element => {
           </Button>
         </div>
       )}
-      <FullscreenEarthquakeAlert />
     </div>
   )
 }

@@ -8,7 +8,7 @@ import { useTranslation } from 'react-i18next'
 import { useTheme } from '@renderer/context/ThemeProvider'
 import type { AppSettingsPatch, NavbarPosition, ThemeMode } from '@shared/types'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
-import { setPage } from '@renderer/store/appSlice'
+import { setSettingsSection } from '@renderer/store/appSlice'
 import styles from './AppNavigationActions.module.scss'
 
 interface AppNavigationActionsProps {
@@ -28,7 +28,6 @@ const AppNavigationActions = ({
   onSettingsChange,
 }: AppNavigationActionsProps): React.JSX.Element => {
   const dispatch = useAppDispatch()
-  const page = useAppSelector((state) => state.app.page)
   const settings = useAppSelector((state) => state.app.settings)
   const { t } = useTranslation()
   const { theme } = useTheme()
@@ -66,11 +65,9 @@ const AppNavigationActions = ({
       <Tooltip placement={tooltipPlacement} title={t('nav.settings')}>
         <Button
           className={styles.actionButton ?? ''}
-          {...(page === 'settings'
-            ? { type: 'primary' as const, ...(light ? { ghost: true as const } : {}) }
-            : { type: 'text' as const })}
+          type="text"
           icon={<Settings size={iconSize} />}
-          onClick={() => dispatch(setPage('settings'))}
+          onClick={() => dispatch(setSettingsSection('general'))}
         />
       </Tooltip>
     </div>

@@ -2,10 +2,10 @@
  * Adds the typed preload bridge to the renderer Window interface.
  */
 
-import type { EarthquakeSignalApi } from '@shared/types'
+import type { LensApi } from '@shared/types'
 
 declare global {
   interface Window {
-    app: EarthquakeSignalApi
+    app: LensApi
   }
 }
