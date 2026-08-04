@@ -1,0 +1,119 @@
+{
+  "name": "earthquake-signal",
+  "version": "1.4.0",
+  "description": "Earthquake Signal desktop application",
+  "main": "./out/main/index.js",
+  "author": "bariskisir",
+  "license": "MIT",
+  "private": true,
+  "scripts": {
+    "dev": "vite",
+    "start": "vite preview",
+    "build": "npm run typecheck && vite build",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
+    "typecheck:web": "tsc --noEmit -p tsconfig.web.json",
+    "lint": "biome lint src tests vite.config.ts vitest.config.ts",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "package": "npm run build && electron-builder --dir",
+    "package:win": "npm run build && electron-builder --win nsis --x64 --publish never && electron-builder --win nsis --arm64 --publish never",
+    "package:win:x64": "npm run build && electron-builder --win nsis --x64 --publish never",
+    "package:win:arm64": "npm run build && electron-builder --win nsis --arm64 --publish never",
+    "package:linux": "npm run build && electron-builder --linux --x64 --publish never && electron-builder --linux --arm64 --publish never",
+    "package:linux:x64": "npm run build && electron-builder --linux --x64 --publish never",
+    "package:linux:arm64": "npm run build && electron-builder --linux --arm64 --publish never",
+    "release": "npm run package:win && npm run package:linux"
+  },
+  "dependencies": {
+    "@eneris/push-receiver": "^4.3.1",
+    "electron-log": "5.4.4",
+    "leaflet": "^1.9.4",
+    "zod": "4.4.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.5.5",
+    "@reduxjs/toolkit": "2.12.0",
+    "@types/leaflet": "^1.9.21",
+    "@types/node": "26.1.1",
+    "@types/react": "19.2.17",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "6.0.3",
+    "antd": "6.5.1",
+    "electron": "43.2.0",
+    "electron-builder": "26.15.3",
+    "i18next": "26.3.6",
+    "jsdom": "29.1.1",
+    "lucide-react": "1.25.0",
+    "prettier": "3.9.6",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-i18next": "17.0.10",
+    "react-redux": "9.3.0",
+    "sass": "1.101.3",
+    "typescript": "7.0.2",
+    "vite": "8.1.5",
+    "vite-plugin-electron": "1.1.0",
+    "vitest": "4.1.10"
+  },
+  "engines": {
+    "node": ">=24.0.0"
+  },
+  "build": {
+    "appId": "com.bariskisir.earthquakesignal",
+    "productName": "Earthquake Signal",
+    "asar": true,
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "out/**/*",
+      "package.json",
+      "LICENSE"
+    ],
+    "extraResources": [
+      {
+        "from": "build/icon.png",
+        "to": "icon.png"
+      }
+    ],
+    "win": {
+      "icon": "build/icon.png",
+      "signExecutable": false,
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64",
+            "arm64"
+          ]
+        }
+      ],
+      "artifactName": "earthquake-signal-${version}-windows-${arch}-setup.${ext}"
+    },
+    "nsis": {
+      "oneClick": false,
+      "differentialPackage": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Earthquake Signal"
+    },
+    "mac": {
+      "icon": "build/icon.png",
+      "target": "dmg",
+      "category": "public.app-category.productivity",
+      "artifactName": "Earthquake-Signal-${version}-mac-${arch}.${ext}"
+    },
+    "linux": {
+      "icon": "build/icon.png",
+      "target": [
+        "AppImage"
+      ],
+      "category": "Utility",
+      "artifactName": "Earthquake-Signal-${version}-linux-${arch}.${ext}"
+    }
+  }
+}

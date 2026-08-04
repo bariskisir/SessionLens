@@ -1,0 +1,128 @@
+# Builds, verifies, packages, and publishes tagged Windows and Linux releases.
+name: Release desktop app
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  release-windows:
+    runs-on: windows-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate tagged version
+        shell: pwsh
+        run: |
+          $tagVersion = '${{ github.ref_name }}' -replace '^v', ''
+          $packageVersion = (Get-Content package.json -Raw | ConvertFrom-Json).version
+          if ($tagVersion -ne $packageVersion) {
+            throw "Tag version $tagVersion does not match package version $packageVersion."
+          }
+
+      - name: Verify source
+        run: |
+          npm run typecheck
+          npm run lint
+          npm test
+          npm run format:check
+
+      - name: Build Windows x64 and arm64 setup
+        run: npm run package:win
+
+      - name: Upload Windows artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: windows-builds
+          path: |
+            release/earthquake-signal-*-windows-*-setup.exe
+          if-no-files-found: error
+
+  release-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y rpm libarchive-tools
+
+      - name: Build Linux x64 AppImage
+        run: npm run package:linux:x64
+
+      - name: Build Linux arm64 AppImage
+        continue-on-error: true
+        run: npm run package:linux:arm64
+
+      - name: List produced artifacts
+        run: ls -la release/
+
+      - name: Upload Linux artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: linux-builds
+          path: |
+            release/Earthquake-Signal-*-linux-*.AppImage
+          if-no-files-found: error
+
+  publish-release:
+    needs: [release-windows, release-linux]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download Windows artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: windows-builds
+          path: release
+
+      - name: Download Linux artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: linux-builds
+          path: release
+
+      - name: List release artifacts
+        run: ls -la release/
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: Earthquake Signal ${{ github.ref_name }}
+          files: |
+            release/earthquake-signal-*-windows-*-setup.exe
+            release/Earthquake-Signal-*-linux-*.AppImage
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          make_latest: true
