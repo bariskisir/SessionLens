@@ -61,10 +61,7 @@ SessionLens/
 |   |   |   |-- BaseOAuthProvider.ts    # Shared OAuth refresh flow
 |   |   |   |-- BaseAuthReader.ts       # Credential discovery contract
 |   |   |   |-- BaseApiKeyProvider.ts   # Unified API-key provider base
-|   |   |   |-- AuthFlow.ts             # OAuth token acquisition/refresh
-|   |   |   |-- Json.ts                 # Typed JSON response parsing
-|   |   |   |-- Http.ts                 # Finite-timeout HTTP helpers
-|   |   |   `-- Formatting.ts           # Number/percent formatting
+|   |   |   `-- CredentialProbe.ts      # Configured-provider credential detection
 |   |   |-- services/
 |   |   |   |-- StorageService.ts       # Serialized settings.json persistence
 |   |   |   |-- LoggerService.ts        # Daily logs and retention
@@ -85,7 +82,11 @@ SessionLens/
 |   |   |       |-- CodexAuthReader.ts         # Codex credential discovery
 |   |   |       |-- ClaudeAuthReader.ts        # Claude credential discovery
 |   |   |       |-- AntigravityAuthReader.ts   # Antigravity credential discovery
-|   |   |       |-- ProviderHttp.ts            # Webhook POST helper
+|   |   |       |-- ProviderHttp.ts            # Finite-timeout HTTP helpers for provider calls
+|   |   |       |-- ProviderJson.ts            # Typed JSON response parsing
+|   |   |       |-- ProviderAuthFlow.ts        # OAuth token acquisition/refresh
+|   |   |       |-- UsageFormatting.ts         # Number/percent/duration formatting
+|   |   |       |-- TrayIconRenderer.ts        # Tray PNG composition from usage bars
 |   |   |       `-- providers/                # One class per provider (Codex, Claude, DeepSeek, ...)
 |   |-- preload/
 |   |   `-- index.ts                    # Typed `window.SessionLensApi` context bridge
@@ -114,10 +115,10 @@ SessionLens/
 |           |-- store/                   # Single Redux app slice
 |           |-- utils/                   # Formatting helpers
 |           `-- assets/styles/           # Shared SCSS variables and resets
-|-- tests/                               # 15 Vitest files / 104 tests at time of writing
+|-- tests/                               # 15 Vitest files / 105 tests at time of writing
 |-- build/                               # Product and notification icons used by the installer
 |-- vite.config.ts
-|-- vitest.config.ts
+|-- vitest.config.mts
 |-- tsconfig.json
 |-- tsconfig.node.json
 |-- tsconfig.web.json

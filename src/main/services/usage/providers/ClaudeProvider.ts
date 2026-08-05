@@ -4,9 +4,9 @@
  */
 
 import type { MetricResult, UsageWindow } from '@shared/types'
-import { getNumber, getObject, getString } from '../../../../main/providers/Json'
-import { getJson, postForm, ProviderError, readAccessToken } from '../../../../main/providers/Http'
-import { capitalize, resetDuration } from '../../../../main/providers/Formatting'
+import { getNumber, getObject, getString } from '../ProviderJson'
+import { getJson, postForm, ProviderError, readAccessToken } from '../ProviderHttp'
+import { capitalize, resetDuration } from '../UsageFormatting'
 import { BaseOAuthProvider, type AuthReader } from '../../../../main/providers/BaseOAuthProvider'
 import type ClaudeAuthReader from '../ClaudeAuthReader'
 import type { ClaudeAuth } from '../ClaudeAuthReader'

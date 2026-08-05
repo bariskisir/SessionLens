@@ -51,12 +51,6 @@ const resolveApiKey = (
 }
 
 /**
- * Returns whether the named provider is allowed to refresh its OAuth token.
- */
-export const canRefreshToken = (context: ProviderQueryContext, providerName: string): boolean =>
-  context.refreshTokenMap.get(providerName.toLowerCase()) ?? true
-
-/**
  * Unified interface that every provider (OAuth and API key) implements.
  */
 export interface IProvider {

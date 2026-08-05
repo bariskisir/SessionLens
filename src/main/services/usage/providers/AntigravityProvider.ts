@@ -5,14 +5,9 @@
 
 import { arch, platform } from 'node:os'
 import type { MetricResult, UsageWindow } from '@shared/types'
-import { getNumber, getObject, getString } from '../../../../main/providers/Json'
-import {
-  getJsonWithHeaders,
-  postForm,
-  postJsonWithHeaders,
-  ProviderError,
-} from '../../../../main/providers/Http'
-import { capitalize, resetDuration } from '../../../../main/providers/Formatting'
+import { getNumber, getObject, getString } from '../ProviderJson'
+import { getJsonWithHeaders, postForm, postJsonWithHeaders, ProviderError } from '../ProviderHttp'
+import { capitalize, resetDuration } from '../UsageFormatting'
 import { BaseOAuthProvider } from '../../../../main/providers/BaseOAuthProvider'
 import type AntigravityAuthReader from '../AntigravityAuthReader'
 import type { AntigravityAuth } from '../AntigravityAuthReader'

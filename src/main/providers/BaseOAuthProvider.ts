@@ -5,7 +5,7 @@
 
 import type { MetricResult, ProviderDescriptor, ProviderResult } from '@shared/types'
 import type { IProvider, ProviderQueryContext } from './IProvider'
-import { executeAuthFlow } from './AuthFlow'
+import { executeAuthFlow } from '../services/usage/ProviderAuthFlow'
 
 /** Minimal credential reader contract — satisfied by BaseAuthReader and AntigravityAuthReader. */
 export interface AuthReader<TAuth> {

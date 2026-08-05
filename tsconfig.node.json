@@ -21,7 +21,7 @@
   },
   "include": [
     "vite.config.ts",
-    "vitest.config.ts",
+    "vitest.config.mts",
     "eslint.config.mjs",
     "src/main/**/*.ts",
     "src/preload/**/*.ts",
