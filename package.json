@@ -1,7 +1,7 @@
 {
-  "name": "lens",
-  "version": "1.4.0",
-  "description": "Lens desktop application",
+  "name": "session-lens",
+  "version": "1.0.0",
+  "description": "Session Lens desktop application",
   "main": "./out/main/index.js",
   "author": "bariskisir",
   "license": "MIT",
@@ -28,6 +28,7 @@
     "release": "npm run package:win && npm run package:linux"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
     "electron-log": "5.4.4",
     "zod": "4.4.3"
   },
@@ -59,8 +60,8 @@
     "node": ">=24.0.0"
   },
   "build": {
-    "appId": "com.bariskisir.lens",
-    "productName": "Lens",
+    "appId": "com.bariskisir.sessionlens",
+    "productName": "Session Lens",
     "asar": true,
     "directories": {
       "output": "release"
@@ -74,6 +75,18 @@
       {
         "from": "build/icon.png",
         "to": "icon.png"
+      },
+      {
+        "from": "build/notification-info.png",
+        "to": "notification-info.png"
+      },
+      {
+        "from": "build/notification-warning.png",
+        "to": "notification-warning.png"
+      },
+      {
+        "from": "build/notification-error.png",
+        "to": "notification-error.png"
       }
     ],
     "win": {
@@ -88,7 +101,7 @@
           ]
         }
       ],
-      "artifactName": "lens-${version}-windows-${arch}-setup.${ext}"
+      "artifactName": "session-lens-${version}-windows-${arch}-setup.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -96,13 +109,13 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Lens"
+      "shortcutName": "Session Lens"
     },
     "mac": {
       "icon": "build/icon.png",
       "target": "dmg",
       "category": "public.app-category.productivity",
-      "artifactName": "Lens-${version}-mac-${arch}.${ext}"
+      "artifactName": "session-lens-${version}-mac-${arch}.${ext}"
     },
     "linux": {
       "icon": "build/icon.png",
@@ -110,7 +123,7 @@
         "AppImage"
       ],
       "category": "Utility",
-      "artifactName": "Lens-${version}-linux-${arch}.${ext}"
+      "artifactName": "session-lens-${version}-linux-${arch}.${ext}"
     }
   }
 }

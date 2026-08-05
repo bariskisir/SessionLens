@@ -1,5 +1,5 @@
 /**
- * Retrieves published Lens releases and downloads verified installers from GitHub.
+ * Retrieves published Session Lens releases and downloads verified installers from GitHub.
  */
 
 import { createHash } from 'node:crypto'
@@ -86,7 +86,7 @@ export const selectWindowsInstaller = (
   architecture: NodeJS.Architecture,
 ): GitHubReleaseAsset => {
   const releaseArchitecture = getReleaseArchitecture(architecture)
-  const expectedName = `lens-${release.version}-windows-${releaseArchitecture}-setup.exe`
+  const expectedName = `session-lens-${release.version}-windows-${releaseArchitecture}-setup.exe`
   const asset = release.assets.find(
     (candidate) => candidate.name.toLowerCase() === expectedName.toLowerCase(),
   )
@@ -116,12 +116,11 @@ export default class GitHubReleaseClient {
     }
   }
 
-  /** Requests the latest release from the same public GitHub REST endpoint used by UsageBar. */
   private async fetchLatestRelease(): Promise<GitHubRelease> {
     const response = await this.fetcher(RELEASES_API_URL, {
       headers: {
         Accept: 'application/vnd.github+json',
-        'User-Agent': 'Lens-Desktop',
+        'User-Agent': 'SessionLens-Desktop',
         'X-GitHub-Api-Version': '2022-11-28',
       },
       signal: AbortSignal.timeout(30_000),
@@ -142,7 +141,7 @@ export default class GitHubReleaseClient {
     parseVersion(version)
     return {
       version,
-      name: parsed.name ?? `Lens v${version}`,
+      name: parsed.name ?? `Session Lens v${version}`,
       ...(parsed.body ? { releaseNotes: parsed.body } : {}),
       pageUrl: parsed.html_url,
       assets: parsed.assets.map((asset) => ({
@@ -164,7 +163,7 @@ export default class GitHubReleaseClient {
     await mkdir(destinationDirectory, { recursive: true })
     const filePath = join(destinationDirectory, asset.name)
     const response = await this.fetcher(asset.downloadUrl, {
-      headers: { 'User-Agent': 'Lens-Desktop' },
+      headers: { 'User-Agent': 'SessionLens-Desktop' },
       redirect: 'follow',
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     })

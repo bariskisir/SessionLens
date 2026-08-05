@@ -4,8 +4,8 @@
 
 const ja = {
   app: {
-    name: 'Lens',
-    tagline: 'フォーカスしたデスクトップアプリケーションシェル。',
+    name: 'Session Lens',
+    tagline: 'AI usage limits',
   },
   common: {
     loading: '読み込み中…',
@@ -23,6 +23,15 @@ const ja = {
     title: '設定',
     general: '一般',
     display: '表示',
+    tooltip: 'ツールチップ',
+    icon: 'アイコン',
+    defaultModels: 'デフォルトモデル',
+    smallModelSelector: '小モデルセレクター',
+    smallModelSelectorDescription:
+      'カンマ区切りのモデル名フラグメント。左から右にチェックされます。セッションリセット後のウィンドウのウォームアップ時に、利用可能な最も軽量なモデルを選択するために使用されます。',
+    providers: 'プロバイダー',
+    notifications: '通知',
+    remoteChannels: 'リモートチャンネル',
     updates: 'アップデート',
     logging: 'ログ',
     about: 'について',
@@ -31,7 +40,7 @@ const ja = {
     timeFormat: '時刻形式',
     timeFormatDescription: '12時間表示と24時間表示を切り替えます。',
     startOnStartup: 'スタートアップ時に起動',
-    startOnStartupDescription: 'サインイン時に Lens を自動的に起動します。',
+    startOnStartupDescription: 'サインイン時に Session Lens を自動的に起動します。',
     timeFormats: {
       '24-hour': '24時間',
       '12-hour': '12時間',
@@ -53,7 +62,7 @@ const ja = {
     resetZoom: 'ズームをリセット',
     traySettings: 'システムトレイ設定',
     showTrayIcon: 'トレイアイコンを表示',
-    showTrayIconDescription: 'Lens をシステムトレイに表示します。',
+    showTrayIconDescription: 'Session Lens をシステムトレイに表示します。',
     minimizeToTrayOnClose: '閉じるときにトレイへ最小化',
     minimizeToTrayOnCloseDescription:
       'ウィンドウを閉じたとき、終了せずにシステムトレイへ隠します。',
@@ -61,7 +70,7 @@ const ja = {
     alwaysOnTop: '常に最前面に表示',
     checkUpdatesOnStartup: '起動時にアップデートを確認',
     checkUpdatesOnStartupDescription:
-      'アプリケーション起動時に新しい Lens バージョンを GitHub で確認します。',
+      'アプリケーション起動時に新しい Session Lens バージョンを GitHub で確認します。',
     unattendedUpdates: '自動サイレントアップデート',
     unattendedUpdatesDescription:
       'アップデートをバックグラウンドでダウンロードし、確認なしでインストールして再起動します。',
@@ -90,6 +99,67 @@ const ja = {
     },
     author: '作者',
     sourceCode: 'ソースコード',
+    iconSettings: '外観',
+    iconLayout: 'アイコンのレイアウト',
+  },
+  providers: {
+    displayOrder: '表示順',
+    displayOrderDescription:
+      'プロバイダーをドラッグして、トレイアイコンとツールチップに表示される順序を選択します。',
+    enabled: '有効',
+    refreshToken: '更新トークンを使用',
+    warmWindow: 'Warm window',
+    apiKey: 'API キー',
+    envKeyDescription: 'このキーは環境変数から読み込まれ、ここでは変更できません。',
+    envKeyPlaceholder: '環境変数から',
+    types: {
+      oauth: 'OAuth',
+      apiKey: 'API キー',
+    },
+  },
+  icon: {
+    tooltipScale: 'ツールチップの倍率',
+    tooltipScaleDescription: 'トレイのツールチップのサイズを調整します。',
+    layoutMode: 'アイコンのレイアウト',
+    layoutModeDescription: '使用量バーがトレイアイコンをどのように埋めるかを選択します。',
+    layoutModes: {
+      auto: '自動',
+      manual: '手動',
+    },
+    dropHint: 'プロバイダーをここにドラッグ',
+    totalWeight: '合計',
+    shelfEmpty: 'すべてのバープロバイダーがアイコン内にあります',
+    removeBar: 'バーを削除',
+  },
+  notifications: {
+    enabled: '通知を有効にする',
+    enabledDescription: '使用量が設定したしきい値に達したときに通知します。',
+    highThreshold: '高しきい値',
+    highThresholdDescription: '高警告を発生させる使用率。',
+    criticalThreshold: '重大しきい値',
+    criticalThresholdDescription: '重大警告を発生させる使用率。',
+    refreshInterval: '更新間隔',
+    refreshIntervalDescription: '使用量が自動更新される頻度。',
+    minutes: '分',
+    test: 'テスト通知',
+    testDescription: '有効な各チャンネルにサンプル通知を送信します。',
+    testButton: 'テスト送信',
+    telegram: {
+      enabled: 'Telegram を有効にする',
+      enabledDescription: '通知を Telegram チャットに配信します。',
+      token: 'ボットトークン',
+      tokenDescription: 'BotFather がボットに発行したトークン。',
+      chatId: 'チャット ID',
+      chatIdDescription: '通知を受け取るチャットの識別子。',
+    },
+    discord: {
+      enabled: 'Discord を有効にする',
+      enabledDescription: 'Webhook 経由で Discord チャンネルに通知を配信します。',
+      webhookUrl: 'Webhook URL',
+      webhookUrlDescription: 'Discord チャンネル用に作成された Webhook URL。',
+      username: 'Webhook ユーザー名',
+      usernameDescription: 'Webhook メッセージに表示される名前。',
+    },
   },
   locales: {
     en: '英語',

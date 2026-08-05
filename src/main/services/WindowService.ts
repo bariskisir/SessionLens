@@ -48,7 +48,7 @@ export default class WindowService {
       minHeight: 300,
       show: false,
       backgroundColor: '#181818',
-      title: 'Lens',
+      title: 'Session Lens',
       ...(process.platform === 'darwin'
         ? {
             titleBarStyle: 'hidden' as const,
@@ -62,7 +62,7 @@ export default class WindowService {
         sandbox: true,
         webSecurity: true,
         devTools: !app.isPackaged,
-        partition: `${app.name}-session`,
+        partition: `${app.name}-profile`,
       },
     })
     this.mainWindow = window

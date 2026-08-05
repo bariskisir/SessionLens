@@ -136,7 +136,7 @@ describe('TrayService', () => {
     expect(service.shouldMinimizeOnClose()).toBe(false)
   })
 
-  it('builds an unseparated Open, Settings, Exit menu and opens settings', () => {
+  it('builds an unseparated Refresh, Settings, Exit menu and opens settings', () => {
     const window = createWindow()
     new TrayService(window, { showTrayIcon: true, minimizeToTrayOnClose: true }, createLogger())
     const menu = electronMocks.menuTemplates[0] as Array<{
@@ -145,7 +145,7 @@ describe('TrayService', () => {
       click?: () => void
     }>
 
-    expect(menu.map((item) => item.label)).toEqual(['Open', 'Settings', 'Exit'])
+    expect(menu.map((item) => item.label)).toEqual(['Refresh', 'Settings', 'Exit'])
     expect(menu.some((item) => item.type === 'separator')).toBe(false)
 
     menu[1]?.click?.()

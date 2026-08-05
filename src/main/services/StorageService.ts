@@ -5,7 +5,7 @@
 import { mkdir, readFile, readdir, unlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { AppSettings, AppSettingsPatch } from '@shared/types'
-import { parsePersistedSettings, settingsSchema } from '../settingsSchema'
+import { normalizeSettings, parsePersistedSettings } from '../settingsSchema'
 
 export default class StorageService {
   private readonly settingsPath: string
@@ -39,7 +39,7 @@ export default class StorageService {
 
   /** Validates and writes application settings directly to their JSON file. */
   public async saveSettings(settings: AppSettings): Promise<AppSettings> {
-    const validated = settingsSchema.parse(settings)
+    const validated = normalizeSettings(settings)
     await this.writeJsonFile(this.settingsPath, validated)
     return validated
   }
@@ -48,7 +48,7 @@ export default class StorageService {
   public async updateSettings(patch: AppSettingsPatch): Promise<AppSettings> {
     return this.withFileLock(this.settingsPath, async () => {
       const current = await this.readSettingsUnlocked()
-      const validated = settingsSchema.parse({ ...current, ...patch })
+      const validated = normalizeSettings({ ...current, ...patch })
       await this.writeJsonFileUnlocked(this.settingsPath, validated)
       return validated
     })

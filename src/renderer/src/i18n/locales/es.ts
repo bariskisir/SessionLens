@@ -4,8 +4,8 @@
 
 const es = {
   app: {
-    name: 'Lens',
-    tagline: 'Un envoltorio de aplicación de escritorio enfocado.',
+    name: 'Session Lens',
+    tagline: 'AI usage limits',
   },
   common: {
     loading: 'Cargando…',
@@ -23,6 +23,15 @@ const es = {
     title: 'Ajustes',
     general: 'General',
     display: 'Apariencia',
+    tooltip: 'Información',
+    icon: 'Icono',
+    defaultModels: 'Modelos predeterminados',
+    smallModelSelector: 'Selector de modelos pequeños',
+    smallModelSelectorDescription:
+      'Fragmentos de nombres de modelo separados por comas, comprobados de izquierda a derecha. Se usa para elegir el modelo más ligero disponible al calentar ventanas después de un reinicio de sesión.',
+    providers: 'Proveedores',
+    notifications: 'Notificaciones',
+    remoteChannels: 'Canales remotos',
     updates: 'Actualizaciones',
     logging: 'Registro',
     about: 'Acerca de',
@@ -31,7 +40,7 @@ const es = {
     timeFormat: 'Formato de hora',
     timeFormatDescription: 'Elige entre el formato de 24 o 12 horas.',
     startOnStartup: 'Iniciar al arrancar',
-    startOnStartupDescription: 'Inicia Lens automáticamente al iniciar sesión.',
+    startOnStartupDescription: 'Inicia Session Lens automáticamente al iniciar sesión.',
     timeFormats: {
       '24-hour': '24 horas',
       '12-hour': '12 horas',
@@ -53,7 +62,7 @@ const es = {
     resetZoom: 'Restablecer zoom',
     traySettings: 'Configuración de la bandeja',
     showTrayIcon: 'Mostrar icono en la bandeja',
-    showTrayIconDescription: 'Mostrar Lens en la bandeja del sistema.',
+    showTrayIconDescription: 'Mostrar Session Lens en la bandeja del sistema.',
     minimizeToTrayOnClose: 'Minimizar a la bandeja al cerrar',
     minimizeToTrayOnCloseDescription:
       'Oculta la ventana en la bandeja del sistema en lugar de salir al cerrarla.',
@@ -61,7 +70,7 @@ const es = {
     alwaysOnTop: 'Siempre visible',
     checkUpdatesOnStartup: 'Buscar actualizaciones al iniciar',
     checkUpdatesOnStartupDescription:
-      'Buscar en GitHub una nueva versión de Lens al iniciar la aplicación.',
+      'Buscar en GitHub una nueva versión de Session Lens al iniciar la aplicación.',
     unattendedUpdates: 'Actualizaciones automáticas desatendidas',
     unattendedUpdatesDescription:
       'Descargar actualizaciones en segundo plano, instalarlas silenciosamente y reiniciar sin pedir confirmación.',
@@ -90,6 +99,67 @@ const es = {
     },
     author: 'Autor',
     sourceCode: 'Código fuente',
+    iconSettings: 'Apariencia',
+    iconLayout: 'Diseño del icono',
+  },
+  providers: {
+    displayOrder: 'Orden de visualización',
+    displayOrderDescription:
+      'Arrastra los proveedores para elegir el orden en que aparecen en el icono de la bandeja y la información sobre herramientas.',
+    enabled: 'Habilitado',
+    refreshToken: 'Usar token de actualización',
+    warmWindow: 'Warm window',
+    apiKey: 'Clave de API',
+    envKeyDescription: 'Esta clave se carga desde una variable de entorno y no se puede cambiar aquí.',
+    envKeyPlaceholder: 'Desde la variable de entorno',
+    types: {
+      oauth: 'OAuth',
+      apiKey: 'Clave de API',
+    },
+  },
+  icon: {
+    tooltipScale: 'Escala de la información',
+    tooltipScaleDescription: 'Ajusta el tamaño de la información sobre herramientas de la bandeja.',
+    layoutMode: 'Diseño del icono',
+    layoutModeDescription: 'Elige cómo las barras de uso rellenan el icono de la bandeja.',
+    layoutModes: {
+      auto: 'Automático',
+      manual: 'Manual',
+    },
+    dropHint: 'Arrastra los proveedores aquí',
+    totalWeight: 'Total',
+    shelfEmpty: 'Todos los proveedores de barras están en el icono',
+    removeBar: 'Quitar barra',
+  },
+  notifications: {
+    enabled: 'Habilitar notificaciones',
+    enabledDescription: 'Notificar cuando el uso alcance los umbrales configurados.',
+    highThreshold: 'Umbral alto',
+    highThresholdDescription: 'Porcentaje de uso que activa una advertencia alta.',
+    criticalThreshold: 'Umbral crítico',
+    criticalThresholdDescription: 'Porcentaje de uso que activa una advertencia crítica.',
+    refreshInterval: 'Intervalo de actualización',
+    refreshIntervalDescription: 'Con qué frecuencia se actualiza el uso automáticamente.',
+    minutes: 'min',
+    test: 'Notificación de prueba',
+    testDescription: 'Enviar una notificación de muestra por cada canal habilitado.',
+    testButton: 'Enviar prueba',
+    telegram: {
+      enabled: 'Habilitar Telegram',
+      enabledDescription: 'Entregar notificaciones a un chat de Telegram.',
+      token: 'Token del bot',
+      tokenDescription: 'El token emitido por BotFather para tu bot.',
+      chatId: 'ID del chat',
+      chatIdDescription: 'El identificador del chat que recibe las notificaciones.',
+    },
+    discord: {
+      enabled: 'Habilitar Discord',
+      enabledDescription: 'Entregar notificaciones a un canal de Discord mediante webhook.',
+      webhookUrl: 'URL del webhook',
+      webhookUrlDescription: 'La URL del webhook creada para tu canal de Discord.',
+      username: 'Nombre de usuario del webhook',
+      usernameDescription: 'El nombre mostrado para los mensajes del webhook.',
+    },
   },
   locales: {
     en: 'Inglés',

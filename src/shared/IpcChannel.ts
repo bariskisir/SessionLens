@@ -19,4 +19,9 @@ export enum IpcChannel {
   UpdateState = 'event:update-state',
   WindowMaximizedChanged = 'event:window-maximized-changed',
   SettingsOpenRequested = 'event:settings-open-requested',
+  SettingsState = 'settings:state',
+  UsageRefreshRequest = 'usage:refresh-request',
+  NotificationTest = 'notification:test',
+  UsageSnapshot = 'usage:snapshot',
+  UsageSnapshotChanged = 'event:usage-snapshot-changed',
 }

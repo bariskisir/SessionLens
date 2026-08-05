@@ -4,6 +4,7 @@
 
 import { describe, expect, it } from 'vitest'
 import {
+  normalizeSettingsPatch,
   parsePersistedSettings,
   settingsPatchSchema,
   settingsSchema,
@@ -41,21 +42,6 @@ describe('parsePersistedSettings', () => {
     expect(parsePersistedSettings(olderSettings).unattendedUpdates).toBe(true)
   })
 
-  it('drops obsolete feature settings', () => {
-    const result = parsePersistedSettings({
-      ...DEFAULT_SETTINGS,
-      removedProvider: 'legacy',
-      removedFeatureEnabled: true,
-      earthquakeLatitude: 40,
-      realtimeAlertsEnabled: true,
-    })
-    expect(result).toEqual(DEFAULT_SETTINGS)
-    expect(result).not.toHaveProperty('removedProvider')
-    expect(result).not.toHaveProperty('removedFeatureEnabled')
-    expect(result).not.toHaveProperty('earthquakeLatitude')
-    expect(result).not.toHaveProperty('realtimeAlertsEnabled')
-  })
-
   it('falls back safely when a generic preference is invalid', () => {
     expect(parsePersistedSettings({ ...DEFAULT_SETTINGS, theme: 'neon' })).toEqual(DEFAULT_SETTINGS)
   })
@@ -86,6 +72,28 @@ describe('settingsPatchSchema', () => {
 
   it('rejects empty and unknown-only patches', () => {
     expect(settingsPatchSchema.safeParse({}).success).toBe(false)
-    expect(settingsPatchSchema.safeParse({ removedFeature: true }).success).toBe(false)
+    expect(settingsPatchSchema.safeParse({ unknownSetting: true }).success).toBe(false)
+  })
+
+  it('retains remote credentials when their delivery channel is disabled', () => {
+    const notification = {
+      ...DEFAULT_SETTINGS.notification,
+      telegram: { token: 'telegram-token', chatId: '123', enabled: false },
+      discord: { webhookUrl: 'https://discord.test/webhook', username: 'Bot', enabled: false },
+    }
+
+    expect(normalizeSettingsPatch({ notification }).notification).toMatchObject(notification)
+  })
+
+  it('migrates a legacy numeric Telegram chat ID to text', () => {
+    const result = parsePersistedSettings({
+      ...DEFAULT_SETTINGS,
+      notification: {
+        ...DEFAULT_SETTINGS.notification,
+        telegram: { ...DEFAULT_SETTINGS.notification.telegram, chatId: -100123 },
+      },
+    })
+
+    expect(result.notification.telegram.chatId).toBe('-100123')
   })
 })

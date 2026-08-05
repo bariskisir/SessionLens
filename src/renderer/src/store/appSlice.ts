@@ -10,13 +10,24 @@ import {
   type UpdateStateEvent,
 } from '@shared/types'
 
-export type SettingsSection = 'general' | 'display' | 'updates' | 'about' | 'logging'
+export type SettingsSection =
+  | 'general'
+  | 'display'
+  | 'tooltip'
+  | 'icon'
+  | 'defaultModels'
+  | 'providers'
+  | 'notifications'
+  | 'updates'
+  | 'about'
+  | 'logging'
 export interface AppState {
   initialized: boolean
   settingsSection: SettingsSection
   settings: AppSettings
   platform: BootstrapPayload['platform']
   version: string
+  environmentApiKeys: Record<string, string>
   update: UpdateStateEvent
 }
 
@@ -26,6 +37,7 @@ const initialState: AppState = {
   settings: DEFAULT_SETTINGS,
   platform: 'win32',
   version: '0.0.0',
+  environmentApiKeys: {},
   update: { state: 'idle' },
 }
 
@@ -40,6 +52,7 @@ const appSlice = createSlice({
       state.settings = action.payload.settings
       state.platform = action.payload.platform
       state.version = action.payload.version
+      state.environmentApiKeys = action.payload.environmentApiKeys
     },
     /** Selects the settings category shown when the settings page is opened. */
     setSettingsSection(state, action: PayloadAction<SettingsSection>) {

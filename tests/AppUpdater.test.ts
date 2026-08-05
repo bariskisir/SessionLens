@@ -12,13 +12,13 @@ import type { UpdateStateEvent } from '../src/shared/types'
 
 const release = {
   version: '1.1.0',
-  name: 'Lens 1.1.0',
-  pageUrl: 'https://github.com/bariskisir/Lens/releases/tag/v1.1.0',
+  name: 'Session Lens 1.1.0',
+  pageUrl: 'https://github.com/bariskisir/SessionLens/releases/tag/v1.1.0',
   assets: [
     {
-      name: 'lens-1.1.0-windows-x64-setup.exe',
+      name: 'session-lens-1.1.0-windows-x64-setup.exe',
       downloadUrl:
-        'https://github.com/bariskisir/Lens/releases/download/v1.1.0/lens-1.1.0-windows-x64-setup.exe',
+        'https://github.com/bariskisir/SessionLens/releases/download/v1.1.0/session-lens-1.1.0-windows-x64-setup.exe',
       size: 1,
     },
   ],
@@ -32,7 +32,7 @@ const createHarness = (autoUpdate: boolean, unattendedUpdates: boolean) => {
     getLatestRelease: vi.fn(async () => release),
     downloadInstaller: vi.fn(async (_asset, _directory, onProgress) => {
       onProgress(50)
-      return { filePath: 'C:\\Temp\\lens-update.exe', sha256: 'abc123' }
+      return { filePath: 'C:\\Temp\\session-lens-update.exe', sha256: 'abc123' }
     }),
   }
   const runtime: UpdateRuntime = {
@@ -40,7 +40,7 @@ const createHarness = (autoUpdate: boolean, unattendedUpdates: boolean) => {
     version: '1.0.0',
     architecture: 'x64',
     platform: 'win32',
-    temporaryDirectory: 'C:\\Temp\\Lens\\Updates',
+    temporaryDirectory: 'C:\\Temp\\SessionLens\\Updates',
     quit,
     launchInstaller,
   }
@@ -60,7 +60,7 @@ describe('AppUpdater unattended updates', () => {
 
     await harness.updater.checkForUpdates()
 
-    expect(harness.launchInstaller).toHaveBeenCalledWith('C:\\Temp\\lens-update.exe')
+    expect(harness.launchInstaller).toHaveBeenCalledWith('C:\\Temp\\session-lens-update.exe')
     expect(harness.quit).toHaveBeenCalledOnce()
     expect(harness.events.at(-1)).toMatchObject({ state: 'downloaded', percent: 100 })
   })

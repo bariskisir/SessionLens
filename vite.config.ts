@@ -25,7 +25,7 @@ const startElectron = async ({
 export default defineConfig({
   root: resolve(repositoryRoot, 'src/renderer'),
   base: './',
-  publicDir: false,
+  publicDir: resolve(repositoryRoot, 'src/renderer/public'),
   plugins: [
     react({}),
     electron({

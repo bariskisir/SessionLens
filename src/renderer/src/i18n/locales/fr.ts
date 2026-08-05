@@ -1,11 +1,11 @@
-/**
+﻿/**
  * French interface strings.
  */
 
 const fr = {
   app: {
-    name: 'Lens',
-    tagline: 'Une coque d’application de bureau ciblée.',
+    name: 'Session Lens',
+    tagline: 'AI usage limits',
   },
   common: {
     loading: 'Chargement…',
@@ -23,6 +23,15 @@ const fr = {
     title: 'Paramètres',
     general: 'Général',
     display: 'Affichage',
+    tooltip: 'Infobulle',
+    icon: 'Icône',
+    defaultModels: 'Modèles par défaut',
+    smallModelSelector: 'Sélecteur de petits modèles',
+    smallModelSelectorDescription:
+      'Fragments de noms de modèles séparés par des virgules, vérifiés de gauche à droite. Utilisé pour sélectionner le modèle le plus léger disponible lors du préchauffage des fenêtres après une réinitialisation de session.',
+    providers: 'Fournisseurs',
+    notifications: 'Notifications',
+    remoteChannels: 'Canaux à distance',
     updates: 'Mises à jour',
     logging: 'Journalisation',
     about: 'À propos',
@@ -31,7 +40,7 @@ const fr = {
     timeFormat: "Format de l'heure",
     timeFormatDescription: 'Choisissez entre une horloge de 24 ou 12 heures.',
     startOnStartup: 'Lancer au démarrage',
-    startOnStartupDescription: 'Lancer automatiquement Lens à la connexion.',
+    startOnStartupDescription: 'Lancer automatiquement Session Lens à la connexion.',
     timeFormats: {
       '24-hour': '24 heures',
       '12-hour': '12 heures',
@@ -53,7 +62,7 @@ const fr = {
     resetZoom: 'Réinitialiser le zoom',
     traySettings: 'Paramètres de la zone de notification',
     showTrayIcon: "Afficher l'icône dans la zone de notification",
-    showTrayIconDescription: 'Afficher Lens dans la zone de notification.',
+    showTrayIconDescription: 'Afficher Session Lens dans la zone de notification.',
     minimizeToTrayOnClose: 'Réduire dans la zone de notification à la fermeture',
     minimizeToTrayOnCloseDescription:
       "Masquez la fenêtre dans la zone de notification au lieu de quitter l'application.",
@@ -61,7 +70,7 @@ const fr = {
     alwaysOnTop: 'Toujours au premier plan',
     checkUpdatesOnStartup: 'Rechercher les mises à jour au démarrage',
     checkUpdatesOnStartupDescription:
-      'Rechercher sur GitHub une nouvelle version de Lens au démarrage de l’application.',
+      'Rechercher sur GitHub une nouvelle version de Session Lens au démarrage de l’application.',
     unattendedUpdates: 'Mises à jour automatiques sans intervention',
     unattendedUpdatesDescription:
       'Télécharger les mises à jour en arrière-plan, les installer silencieusement et redémarrer sans confirmation.',
@@ -90,6 +99,67 @@ const fr = {
     },
     author: 'Auteur',
     sourceCode: 'Code source',
+    iconSettings: 'Apparence',
+    iconLayout: 'Disposition des icônes',
+  },
+  providers: {
+    displayOrder: 'Ordre d’affichage',
+    displayOrderDescription:
+      'Faites glisser les fournisseurs pour définir l’ordre d’affichage dans l’icône de la barre d’état et l’infobulle.',
+    enabled: 'Activé',
+    refreshToken: 'Utiliser le jeton de rafraîchissement',
+    warmWindow: 'Warm window',
+    apiKey: 'Clé API',
+    envKeyDescription: 'Cette clé est chargée depuis une variable d’environnement et ne peut pas être modifiée ici.',
+    envKeyPlaceholder: 'Depuis l’environnement',
+    types: {
+      oauth: 'OAuth',
+      apiKey: 'Clé API',
+    },
+  },
+  icon: {
+    tooltipScale: 'Échelle de l’infobulle',
+    tooltipScaleDescription: 'Ajustez la taille de l’infobulle de la barre d’état.',
+    layoutMode: 'Disposition des icônes',
+    layoutModeDescription: 'Choisissez comment les barres d’utilisation remplissent l’icône.',
+    layoutModes: {
+      auto: 'Automatique',
+      manual: 'Manuel',
+    },
+    dropHint: 'Glissez les fournisseurs ici',
+    totalWeight: 'Total',
+    shelfEmpty: 'Tous les fournisseurs de barres sont dans l’icône',
+    removeBar: 'Supprimer la barre',
+  },
+  notifications: {
+    enabled: 'Activer les notifications',
+    enabledDescription: 'Notifier lorsque l’utilisation atteint les seuils configurés.',
+    highThreshold: 'Seuil élevé',
+    highThresholdDescription: "Pourcentage d'utilisation déclenchant un avertissement élevé.",
+    criticalThreshold: 'Seuil critique',
+    criticalThresholdDescription: "Pourcentage d'utilisation déclenchant un avertissement critique.",
+    refreshInterval: "Intervalle d'actualisation",
+    refreshIntervalDescription: "Fréquence d'actualisation automatique de l'utilisation.",
+    minutes: 'min',
+    test: 'Notification de test',
+    testDescription: 'Envoyer une notification d’exemple via chaque canal activé.',
+    testButton: 'Envoyer le test',
+    telegram: {
+      enabled: 'Activer Telegram',
+      enabledDescription: 'Livrer les notifications à un chat Telegram.',
+      token: 'Jeton du bot',
+      tokenDescription: 'Le jeton délivré par BotFather pour votre bot.',
+      chatId: 'ID du chat',
+      chatIdDescription: "L'identifiant du chat qui reçoit les notifications.",
+    },
+    discord: {
+      enabled: 'Activer Discord',
+      enabledDescription: 'Livrer les notifications à un canal Discord via un webhook.',
+      webhookUrl: 'URL du webhook',
+      webhookUrlDescription: "L'URL du webhook créée pour votre canal Discord.",
+      username: "Nom d'utilisateur du webhook",
+      usernameDescription: "Le nom affiché pour les messages du webhook.",
+    },
   },
   locales: {
     en: 'Anglais',

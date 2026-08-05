@@ -37,7 +37,7 @@ describe('startup', () => {
   })
 
   it('recognizes only an exact hidden startup argument', () => {
-    expect(isHiddenStartupLaunch(['Lens.exe', START_HIDDEN_ARGUMENT])).toBe(true)
-    expect(isHiddenStartupLaunch(['Lens.exe', '--hidden-window'])).toBe(false)
+    expect(isHiddenStartupLaunch(['SessionLens.exe', START_HIDDEN_ARGUMENT])).toBe(true)
+    expect(isHiddenStartupLaunch(['SessionLens.exe', '--hidden-window'])).toBe(false)
   })
 })

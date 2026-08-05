@@ -11,22 +11,19 @@ export interface ApplicationPaths {
   dataRoot: string
   logsRoot: string
   runtimeRoot: string
-  sessionRoot: string
 }
 
 /** Configures Electron paths before ready so Chromium files stay outside durable app data. */
 export const configureApplicationPaths = (): ApplicationPaths => {
-  const applicationDataRoot = join(app.getPath('appData'), 'Lens')
+  const applicationDataRoot = join(app.getPath('appData'), 'Session Lens')
   const dataRoot = join(applicationDataRoot, 'Data')
   const logsRoot = join(applicationDataRoot, 'Logs')
   const runtimeRoot = join(applicationDataRoot, 'Runtime')
-  const sessionRoot = join(runtimeRoot, 'Session')
 
-  ;[applicationDataRoot, dataRoot, logsRoot, runtimeRoot, sessionRoot].forEach((directory) => {
+  ;[applicationDataRoot, dataRoot, logsRoot, runtimeRoot].forEach((directory) => {
     mkdirSync(directory, { recursive: true })
   })
   app.setPath('userData', runtimeRoot)
-  app.setPath('sessionData', sessionRoot)
   app.setAppLogsPath(logsRoot)
 
   return {
@@ -34,6 +31,5 @@ export const configureApplicationPaths = (): ApplicationPaths => {
     dataRoot,
     logsRoot,
     runtimeRoot,
-    sessionRoot,
   }
 }
