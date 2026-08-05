@@ -3,7 +3,7 @@
  * @description Electron app lifecycle — delegates service composition to the provider registry and factory helpers.
  */
 
-import { app, BrowserWindow, Notification } from 'electron'
+import { app, BrowserWindow, Menu, Notification } from 'electron'
 import { configureApplicationPaths } from './ApplicationPaths'
 import { registerIpc } from './ipc'
 import { configureStartOnLogin, isHiddenStartupLaunch } from './startup'
@@ -27,8 +27,11 @@ import { IpcChannel } from '@shared/IpcChannel'
 
 app.commandLine.appendSwitch('autoplay-policy', 'no-user-gesture-required')
 app.commandLine.appendSwitch('wm-window-animations-disabled')
+app.commandLine.appendSwitch('disable-gpu')
+app.commandLine.appendSwitch('disable-direct-composition')
 app.disableHardwareAcceleration()
 app.setName('Session Lens')
+if (process.platform !== 'darwin') Menu.setApplicationMenu(null)
 
 const productApplicationUserModelId = 'com.bariskisir.sessionlens'
 if (process.platform === 'win32') {
