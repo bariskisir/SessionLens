@@ -2,9 +2,12 @@
 name: Release desktop app
 
 on:
-  push:
-    tags:
-      - 'v*'
+  # Tag-triggered release publishing is temporarily disabled.
+  # Uncomment to re-enable automatic releases when a 'v*' tag is pushed.
+  # push:
+  #   tags:
+  #     - 'v*'
+  workflow_dispatch:
 
 permissions:
   contents: write

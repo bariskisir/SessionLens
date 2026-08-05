@@ -39,8 +39,6 @@ export default class UsageRefreshService {
   private manualRefreshTrigger: ((requestedAt: number) => void) | null = null
   /** Latest cached usage snapshot event. */
   private lastSnapshot: UsageSnapshotEvent | null = null
-  /** Timer instance for scheduled refresh delays. */
-  private readonly refreshTimer: NodeJS.Timeout | null = null
 
   /**
    * Initializes a new instance of UsageRefreshService.

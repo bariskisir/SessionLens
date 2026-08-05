@@ -1,6 +1,6 @@
 {
   "name": "session-lens",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Session Lens desktop application",
   "main": "./out/main/index.js",
   "author": "bariskisir",
@@ -13,7 +13,7 @@
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json",
-    "lint": "biome lint src tests vite.config.ts vitest.config.ts",
+    "lint": "biome lint src tests vite.config.ts vitest.config.mts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",
@@ -43,7 +43,6 @@
     "electron": "^43.3.0",
     "electron-builder": "26.15.3",
     "i18next": "26.3.6",
-    "jsdom": "^30.0.1",
     "lucide-react": "^1.28.0",
     "prettier": "3.9.6",
     "react": "19.2.8",
@@ -75,18 +74,6 @@
       {
         "from": "build/icon.png",
         "to": "icon.png"
-      },
-      {
-        "from": "build/notification-info.png",
-        "to": "notification-info.png"
-      },
-      {
-        "from": "build/notification-warning.png",
-        "to": "notification-warning.png"
-      },
-      {
-        "from": "build/notification-error.png",
-        "to": "notification-error.png"
       }
     ],
     "win": {
