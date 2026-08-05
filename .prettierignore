@@ -3,4 +3,6 @@ out
 release
 coverage
 package-lock.json
-
+AGENTS.md
+CLAUDE.md
+README.md

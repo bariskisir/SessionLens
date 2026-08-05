@@ -4,8 +4,8 @@
 
 const de = {
   app: {
-    name: 'Lens',
-    tagline: 'Eine fokussierte Desktop-Anwendungsstruktur.',
+    name: 'Session Lens',
+    tagline: 'AI-Nutzungslimits',
   },
   common: {
     loading: 'Laden…',
@@ -23,6 +23,15 @@ const de = {
     title: 'Einstellungen',
     general: 'Allgemein',
     display: 'Anzeige',
+    tooltip: 'Tooltip',
+    icon: 'Symbol',
+    defaultModels: 'Standardmodelle',
+    smallModelSelector: 'Kleines Modell auswählen',
+    smallModelSelectorDescription:
+      'Durch Kommas getrennte Modellnamen-Fragmente, von links nach rechts geprüft. Wird verwendet, um nach einem Sitzungs-Reset das leichteste verfügbare Modell zum Aufwärmen von Fenstern auszuwählen.',
+    providers: 'Anbieter',
+    notifications: 'Benachrichtigungen',
+    remoteChannels: 'Remote-Kanäle',
     updates: 'Updates',
     logging: 'Protokollierung',
     about: 'Über',
@@ -31,7 +40,7 @@ const de = {
     timeFormat: 'Zeitformat',
     timeFormatDescription: 'Wählen Sie zwischen 24- und 12-Stunden-Anzeige.',
     startOnStartup: 'Beim Systemstart starten',
-    startOnStartupDescription: 'Lens nach der Anmeldung automatisch starten.',
+    startOnStartupDescription: 'Session Lens nach der Anmeldung automatisch starten.',
     timeFormats: {
       '24-hour': '24 Stunden',
       '12-hour': '12 Stunden',
@@ -53,7 +62,7 @@ const de = {
     resetZoom: 'Zoom zurücksetzen',
     traySettings: 'Infobereich-Einstellungen',
     showTrayIcon: 'Symbol im Infobereich anzeigen',
-    showTrayIconDescription: 'Lens im Infobereich anzeigen.',
+    showTrayIconDescription: 'Session Lens im Infobereich anzeigen.',
     minimizeToTrayOnClose: 'Beim Schließen in den Infobereich minimieren',
     minimizeToTrayOnCloseDescription:
       'Das Fenster beim Schließen im Infobereich ausblenden, statt die Anwendung zu beenden.',
@@ -61,7 +70,7 @@ const de = {
     alwaysOnTop: 'Immer im Vordergrund',
     checkUpdatesOnStartup: 'Beim Start nach Updates suchen',
     checkUpdatesOnStartupDescription:
-      'Beim Start der Anwendung auf GitHub nach einer neuen Lens-Version suchen.',
+      'Beim Start der Anwendung auf GitHub nach einer neuen Session Lens-Version suchen.',
     unattendedUpdates: 'Automatische unbeaufsichtigte Updates',
     unattendedUpdatesDescription:
       'Updates im Hintergrund herunterladen, ohne Rückfrage installieren und die Anwendung neu starten.',
@@ -90,6 +99,64 @@ const de = {
     },
     author: 'Autor',
     sourceCode: 'Quellcode',
+    iconSettings: 'Erscheinungsbild',
+    iconLayout: 'Symbol-Layout',
+  },
+  providers: {
+    displayOrder: 'Anzeigereihenfolge',
+    displayOrderDescription:
+      'Ziehen Sie Anbieter per Drag-and-drop, um die Reihenfolge im Tray-Symbol und Tooltip festzulegen.',
+    enabled: 'Aktiviert',
+    refreshToken: 'Refresh-Token verwenden',
+    warmWindow: 'Warmup-Fenster',
+    apiKey: 'API-Schlüssel',
+    envKeyDescription:
+      'Dieser Schlüssel wird aus einer Umgebungsvariable geladen und kann hier nicht geändert werden.',
+    envKeyPlaceholder: 'Aus Umgebungsvariable',
+  },
+  icon: {
+    tooltipScale: 'Tooltip-Skalierung',
+    tooltipScaleDescription: 'Passen Sie die Größe des Tray-Tooltips an.',
+    layoutMode: 'Symbol-Layout',
+    layoutModeDescription: 'Wählen Sie, wie Nutzungsbalken das Tray-Symbol füllen.',
+    layoutModes: {
+      auto: 'Automatisch',
+      manual: 'Manuell',
+    },
+    dropHint: 'Anbieter hierher ziehen',
+    totalWeight: 'Gesamt',
+    shelfEmpty: 'Alle Balken-Anbieter sind im Symbol',
+    removeBar: 'Balken entfernen',
+  },
+  notifications: {
+    enabled: 'Benachrichtigungen aktivieren',
+    enabledDescription: 'Benachrichtigen, wenn die Nutzung die festgelegten Schwellen erreicht.',
+    highThreshold: 'Hohe Schwelle',
+    highThresholdDescription: 'Nutzungsanteil, der eine hohe Warnung auslöst.',
+    criticalThreshold: 'Kritische Schwelle',
+    criticalThresholdDescription: 'Nutzungsanteil, der eine kritische Warnung auslöst.',
+    refreshInterval: 'Aktualisierungsintervall',
+    refreshIntervalDescription: 'Wie oft die Nutzung automatisch aktualisiert wird.',
+    minutes: 'Min.',
+    test: 'Testbenachrichtigung',
+    testDescription: 'Über jeden aktivierten Kanal eine Beispielbenachrichtigung senden.',
+    testButton: 'Test senden',
+    telegram: {
+      enabled: 'Telegram aktivieren',
+      enabledDescription: 'Benachrichtigungen an einen Telegram-Chat liefern.',
+      token: 'Bot-Token',
+      tokenDescription: 'Das von BotFather für Ihren Bot ausgestellte Token.',
+      chatId: 'Chat-ID',
+      chatIdDescription: 'Die Chat-ID, die Benachrichtigungen empfängt.',
+    },
+    discord: {
+      enabled: 'Discord aktivieren',
+      enabledDescription: 'Benachrichtigungen über einen Webhook an einen Discord-Kanal liefern.',
+      webhookUrl: 'Webhook-URL',
+      webhookUrlDescription: 'Die für Ihren Discord-Kanal erstellte Webhook-URL.',
+      username: 'Webhook-Benutzername',
+      usernameDescription: 'Der angezeigte Name für die Webhook-Nachrichten.',
+    },
   },
   locales: {
     en: 'Englisch',

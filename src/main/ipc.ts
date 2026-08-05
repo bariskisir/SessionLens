@@ -1,11 +1,12 @@
 /**
- * Defines the validated IPC boundary between the renderer and main-process services.
+ * @file ipc.ts
+ * @description Defines the validated IPC boundary between renderer and main-process services.
  */
 
 import { app, ipcMain, shell, type BrowserWindow, type WebContents } from 'electron'
 import { IpcChannel } from '@shared/IpcChannel'
 import { APP_AUTHOR_URL } from '@shared/appInfo'
-import { LOG_LEVELS, type UpdateStateEvent } from '@shared/types'
+import { LOG_LEVELS, PROVIDER_DESCRIPTORS, type UpdateStateEvent } from '@shared/types'
 import { z } from 'zod'
 import { settingsPatchSchema } from './settingsSchema'
 import { configureStartOnLogin } from './startup'
@@ -13,7 +14,9 @@ import type AppUpdater from './services/AppUpdater'
 import type LoggerService from './services/LoggerService'
 import type StorageService from './services/StorageService'
 import type TrayService from './services/TrayService'
+import type UsageRefreshService from './services/usage/UsageRefreshService'
 
+/** Validation schema for renderer log write requests. */
 const rendererLogSchema = z.object({
   level: z.enum(LOG_LEVELS),
   module: z.string().trim().min(1).max(100),
@@ -21,16 +24,21 @@ const rendererLogSchema = z.object({
   details: z.string().max(8_000).optional(),
 })
 
+/** Trusted external web origins allowed for shell.openExternal calls. */
 const TRUSTED_EXTERNAL_ORIGINS = new Set(['https://github.com', APP_AUTHOR_URL])
 
+/** Context interface for registered IPC main-process services. */
 interface IpcServices {
   storage: StorageService
   tray: TrayService
   updater: AppUpdater
   logger: LoggerService
+  usage: UsageRefreshService
 }
 
-/** Removes previous handlers before a replacement window is attached. */
+/**
+ * Removes previous IPC handlers and listeners before a replacement window is attached.
+ */
 export const removeIpcHandlers = (): void => {
   Object.values(IpcChannel).forEach((channel) => {
     ipcMain.removeHandler(channel)
@@ -38,16 +46,30 @@ export const removeIpcHandlers = (): void => {
   ipcMain.removeAllListeners(IpcChannel.LogWrite)
 }
 
-/** Registers all renderer commands against explicit main-process services. */
+/**
+ * Registers all renderer command handlers against main-process services.
+ *
+ * @param window - Active BrowserWindow instance
+ * @param services - Dictionary of main-process services
+ */
 export const registerIpc = (window: BrowserWindow, services: IpcServices): void => {
   removeIpcHandlers()
 
-  /** Rejects any IPC call not originating from the main renderer. */
+  /**
+   * Rejects any IPC call not originating from the active renderer window.
+   *
+   * @param sender - Sender WebContents instance
+   */
   const assertSender = (sender: WebContents): void => {
     if (sender.id !== window.webContents.id) throw new Error('Untrusted IPC sender.')
   }
 
-  /** Sends a typed event only while the window is alive. */
+  /**
+   * Sends a typed event to the renderer window while it is alive.
+   *
+   * @param channel - Target IPC channel enum value
+   * @param payload - Payload object
+   */
   const send = <T>(channel: IpcChannel, payload: T): void => {
     if (!window.isDestroyed()) window.webContents.send(channel, payload)
   }
@@ -69,6 +91,15 @@ export const registerIpc = (window: BrowserWindow, services: IpcServices): void 
       settings,
       platform: process.platform,
       version: app.getVersion(),
+      environmentApiKeys: PROVIDER_DESCRIPTORS.reduce<Record<string, string>>(
+        (keys, descriptor) => {
+          if (descriptor.credentialName && process.env[descriptor.credentialName]) {
+            keys[descriptor.credentialName] = process.env[descriptor.credentialName] ?? ''
+          }
+          return keys
+        },
+        {},
+      ),
     }
   })
   ipcMain.handle(IpcChannel.SettingsSave, async (event, input: unknown) => {
@@ -88,8 +119,12 @@ export const registerIpc = (window: BrowserWindow, services: IpcServices): void 
     window.setAlwaysOnTop(savedSettings.alwaysOnTop)
     window.webContents.setZoomFactor(savedSettings.pageZoom)
     services.tray.applySettings(savedSettings)
+    services.tray.setTooltipScale(savedSettings.visual.scale)
     services.logger.setLevel(savedSettings.logLevel)
     services.updater.applySettings(savedSettings)
+    if (patch.providers !== undefined || patch.visual?.iconLayout !== undefined) {
+      services.usage.requestManualRefresh()
+    }
     return savedSettings
   })
   ipcMain.handle(IpcChannel.WindowAlwaysOnTop, (event, enabled: unknown) => {
@@ -160,5 +195,17 @@ export const registerIpc = (window: BrowserWindow, services: IpcServices): void 
   ipcMain.handle(IpcChannel.UpdatesInstall, async (event) => {
     assertSender(event.sender)
     await services.updater.quitAndInstall()
+  })
+  ipcMain.handle(IpcChannel.NotificationTest, async (event) => {
+    assertSender(event.sender)
+    await services.usage.sendTestNotificationAsync()
+  })
+  ipcMain.handle(IpcChannel.UsageRefreshRequest, async (event) => {
+    assertSender(event.sender)
+    services.usage.requestManualRefresh()
+  })
+  ipcMain.handle(IpcChannel.UsageSnapshot, async (event) => {
+    assertSender(event.sender)
+    return services.usage.getSnapshot()
   })
 }

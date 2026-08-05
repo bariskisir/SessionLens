@@ -5,14 +5,17 @@
 import { mkdir, readFile, readdir, unlink, writeFile } from 'node:fs/promises'
 import { join } from 'node:path'
 import type { AppSettings, AppSettingsPatch } from '@shared/types'
-import { parsePersistedSettings, settingsSchema } from '../settingsSchema'
+import { normalizeSettings, parsePersistedSettings } from '../settingsSchema'
 
 export default class StorageService {
   private readonly settingsPath: string
   private readonly fileOperationTails = new Map<string, Promise<void>>()
 
   /** Creates a storage service rooted in the private application data directory. */
-  public constructor(private readonly rootPath: string) {
+  public constructor(
+    private readonly rootPath: string,
+    private readonly probeConfiguredProviders: () => Promise<string[]> = async () => [],
+  ) {
     this.settingsPath = join(rootPath, 'settings.json')
   }
 
@@ -33,13 +36,13 @@ export default class StorageService {
       const value: unknown = JSON.parse(await readFile(this.settingsPath, 'utf8'))
       return parsePersistedSettings(value)
     } catch {
-      return parsePersistedSettings(null)
+      return parsePersistedSettings(null, await this.probeConfiguredProviders())
     }
   }
 
   /** Validates and writes application settings directly to their JSON file. */
   public async saveSettings(settings: AppSettings): Promise<AppSettings> {
-    const validated = settingsSchema.parse(settings)
+    const validated = normalizeSettings(settings)
     await this.writeJsonFile(this.settingsPath, validated)
     return validated
   }
@@ -48,7 +51,7 @@ export default class StorageService {
   public async updateSettings(patch: AppSettingsPatch): Promise<AppSettings> {
     return this.withFileLock(this.settingsPath, async () => {
       const current = await this.readSettingsUnlocked()
-      const validated = settingsSchema.parse({ ...current, ...patch })
+      const validated = normalizeSettings({ ...current, ...patch })
       await this.writeJsonFileUnlocked(this.settingsPath, validated)
       return validated
     })

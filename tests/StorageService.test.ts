@@ -7,6 +7,7 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 import StorageService from '../src/main/services/StorageService'
+import { DEFAULT_SETTINGS, type AppSettings } from '../src/shared/types'
 
 let rootPath = ''
 let storage: StorageService
@@ -24,7 +25,7 @@ afterEach(async () => {
 describe('StorageService', () => {
   it('loads defaults for missing data', async () => {
     await expect(storage.loadSettings()).resolves.toEqual(
-      expect.objectContaining({ settingsRevision: 3, theme: 'system' }),
+      expect.objectContaining({ settingsRevision: 4, theme: 'system' }),
     )
   })
 
@@ -35,22 +36,11 @@ describe('StorageService', () => {
   })
 
   it('drops obsolete fields while saving complete settings', async () => {
-    const saved = await storage.saveSettings({
-      settingsRevision: 3,
-      uiLanguage: 'en',
-      theme: 'system',
-      navbarPosition: 'top',
-      pageZoom: 1,
-      timeFormat: '24-hour',
-      startOnStartup: true,
-      alwaysOnTop: false,
-      showTrayIcon: true,
-      minimizeToTrayOnClose: true,
-      autoUpdate: true,
-      unattendedUpdates: true,
-      logLevel: 'info',
-      removedFeature: true,
-    } as Parameters<typeof storage.saveSettings>[0])
-    expect(saved).not.toHaveProperty('removedFeature')
+    const candidate = structuredClone(DEFAULT_SETTINGS) as AppSettings & {
+      obsoleteSetting?: boolean
+    }
+    candidate.obsoleteSetting = true
+    const saved = await storage.saveSettings(candidate)
+    expect(saved).not.toHaveProperty('obsoleteSetting')
   })
 })

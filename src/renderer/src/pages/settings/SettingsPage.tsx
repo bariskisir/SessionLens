@@ -1,19 +1,40 @@
 /**
- * Renders the reusable settings shell and delegates each category to an isolated section.
+ * @file SettingsPage.tsx
+ * @description Renders the application settings shell, side navigation menu, and dynamic settings category sections.
  */
 
-import { Info, Monitor, RefreshCw, ScrollText, Settings2 } from 'lucide-react'
+import {
+  Bell,
+  Bot,
+  Info,
+  MessageSquare,
+  Monitor,
+  Palette,
+  RefreshCw,
+  ScrollText,
+  Server,
+  Settings2,
+} from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAppDispatch, useAppSelector } from '@renderer/store'
 import { setSettingsSection, type SettingsSection } from '@renderer/store/appSlice'
 import AboutSettingsSection from './sections/AboutSettingsSection'
 import GeneralSettingsSection from './sections/GeneralSettingsSection'
 import DisplaySettingsSection from './sections/DisplaySettingsSection'
+import DefaultModelsSettingsSection from './sections/DefaultModelsSettingsSection'
+import TooltipSettingsSection from './sections/TooltipSettingsSection'
+import IconSettingsSection from './sections/IconSettingsSection'
 import LoggingSettingsSection from './sections/LoggingSettingsSection'
+import NotificationsSettingsSection from './sections/NotificationsSettingsSection'
+import ProvidersSettingsSection from './sections/ProvidersSettingsSection'
 import UpdatesSettingsSection from './sections/UpdatesSettingsSection'
 import styles from './SettingsPage.module.scss'
 
-/** Renders category navigation and the selected settings section. */
+/**
+ * Renders settings category navigation sidebar and active settings section body.
+ *
+ * @returns JSX Element for Settings page
+ */
 const SettingsPage = (): React.JSX.Element => {
   const dispatch = useAppDispatch()
   const section = useAppSelector((state) => state.app.settingsSection)
@@ -25,19 +46,30 @@ const SettingsPage = (): React.JSX.Element => {
   }> = [
     { key: 'general', label: t('settings.general'), icon: <Settings2 size={17} /> },
     { key: 'display', label: t('settings.display'), icon: <Monitor size={17} /> },
+    { key: 'providers', label: t('settings.providers'), icon: <Server size={17} /> },
+    { key: 'notifications', label: t('settings.notifications'), icon: <Bell size={17} /> },
+    { key: 'tooltip', label: t('settings.tooltip'), icon: <MessageSquare size={17} /> },
+    { key: 'icon', label: t('settings.icon'), icon: <Palette size={17} /> },
+    { key: 'defaultModels', label: t('settings.defaultModels'), icon: <Bot size={17} /> },
     { key: 'updates', label: t('settings.updates'), icon: <RefreshCw size={17} /> },
     { key: 'logging', label: t('settings.logging'), icon: <ScrollText size={17} /> },
     { key: 'about', label: t('settings.about'), icon: <Info size={17} /> },
   ]
 
-  /** Resolves the active category component without keeping inactive forms mounted. */
-  const renderSection = (): React.JSX.Element => {
-    if (section === 'display') return <DisplaySettingsSection />
-    if (section === 'updates') return <UpdatesSettingsSection />
-    if (section === 'logging') return <LoggingSettingsSection />
-    if (section === 'about') return <AboutSettingsSection />
-    return <GeneralSettingsSection />
+  const sectionComponents: Record<SettingsSection, React.ComponentType> = {
+    general: GeneralSettingsSection,
+    display: DisplaySettingsSection,
+    providers: ProvidersSettingsSection,
+    notifications: NotificationsSettingsSection,
+    tooltip: TooltipSettingsSection,
+    icon: IconSettingsSection,
+    defaultModels: DefaultModelsSettingsSection,
+    updates: UpdatesSettingsSection,
+    logging: LoggingSettingsSection,
+    about: AboutSettingsSection,
   }
+
+  const SectionComponent = sectionComponents[section] ?? GeneralSettingsSection
 
   return (
     <main className={styles.shell}>
@@ -55,7 +87,7 @@ const SettingsPage = (): React.JSX.Element => {
           </button>
         ))}
       </aside>
-      {renderSection()}
+      <SectionComponent />
     </main>
   )
 }

@@ -4,8 +4,7 @@
 
 import { contextBridge, ipcRenderer, type IpcRendererEvent } from 'electron'
 import { IpcChannel } from '@shared/IpcChannel'
-import type { LensApi, UpdateStateEvent } from '@shared/types'
-
+import type { SessionLensApi, UpdateStateEvent, UsageSnapshotEvent } from '@shared/types'
 /** Subscribes to one approved event and returns a cleanup callback. */
 const subscribe = <T>(channel: IpcChannel, listener: (payload: T) => void): (() => void) => {
   const handler = (_event: IpcRendererEvent, payload: T): void => listener(payload)
@@ -13,7 +12,7 @@ const subscribe = <T>(channel: IpcChannel, listener: (payload: T) => void): (() 
   return () => ipcRenderer.removeListener(channel, handler)
 }
 
-const api: LensApi = {
+const api: SessionLensApi = {
   /** Loads persisted settings and application metadata. */
   bootstrap: () => ipcRenderer.invoke(IpcChannel.AppBootstrap),
   /** Atomically merges validated application settings fields. */
@@ -48,6 +47,17 @@ const api: LensApi = {
   /** Subscribes to settings navigation requested by the tray menu. */
   onSettingsOpenRequested: (listener) =>
     subscribe<void>(IpcChannel.SettingsOpenRequested, listener),
+  /** Resolves settings plus main-process metadata for the usage settings page. */
+  getSettingsState: () => ipcRenderer.invoke(IpcChannel.SettingsState),
+  /** Requests an immediate usage refresh through the running refresh loop. */
+  requestUsageRefresh: () => ipcRenderer.invoke(IpcChannel.UsageRefreshRequest),
+  /** Sends a test threshold notification through every enabled channel. */
+  sendTestNotification: () => ipcRenderer.invoke(IpcChannel.NotificationTest),
+  /** Returns the latest tooltip card snapshot produced by a refresh. */
+  getUsageSnapshot: () => ipcRenderer.invoke(IpcChannel.UsageSnapshot),
+  /** Subscribes to usage snapshot updates produced by each completed refresh. */
+  onUsageSnapshot: (listener) =>
+    subscribe<UsageSnapshotEvent>(IpcChannel.UsageSnapshotChanged, listener),
 }
 
 contextBridge.exposeInMainWorld('app', api)

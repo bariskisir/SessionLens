@@ -4,15 +4,31 @@
 
 import { describe, expect, it } from 'vitest'
 import {
+  normalizeSettingsPatch,
   parsePersistedSettings,
   settingsPatchSchema,
   settingsSchema,
 } from '../src/main/settingsSchema'
-import { DEFAULT_SETTINGS } from '../src/shared/types'
+import { DEFAULT_SETTINGS, PROVIDER_DESCRIPTORS } from '../src/shared/types'
 
 describe('parsePersistedSettings', () => {
-  it('returns defaults for missing data', () => {
-    expect(parsePersistedSettings(null)).toEqual(DEFAULT_SETTINGS)
+  it('returns defaults with all registered providers for missing data', () => {
+    const result = parsePersistedSettings(null)
+    expect(result.providers).toHaveLength(PROVIDER_DESCRIPTORS.length)
+    expect(result.providers.every((provider) => !provider.enabled)).toBe(true)
+    expect(result).toMatchObject({ theme: 'system', uiLanguage: 'en', settingsRevision: 4 })
+  })
+
+  it('enables providers whose credentials exist on first install', () => {
+    const result = parsePersistedSettings(null, ['codex', 'claude', 'antigravity', 'deepseek'])
+    const enabled = result.providers.filter((provider) => provider.enabled)
+    expect(enabled.map((provider) => provider.name).sort()).toEqual(
+      ['Antigravity', 'Claude', 'Codex', 'DeepSeek'].sort(),
+    )
+    for (const provider of result.providers) {
+      expect(provider.refreshToken).toBe(true)
+    }
+    expect(result.providers).toHaveLength(PROVIDER_DESCRIPTORS.length)
   })
 
   it('preserves valid generic preferences', () => {
@@ -41,23 +57,10 @@ describe('parsePersistedSettings', () => {
     expect(parsePersistedSettings(olderSettings).unattendedUpdates).toBe(true)
   })
 
-  it('drops obsolete feature settings', () => {
-    const result = parsePersistedSettings({
-      ...DEFAULT_SETTINGS,
-      removedProvider: 'legacy',
-      removedFeatureEnabled: true,
-      earthquakeLatitude: 40,
-      realtimeAlertsEnabled: true,
-    })
-    expect(result).toEqual(DEFAULT_SETTINGS)
-    expect(result).not.toHaveProperty('removedProvider')
-    expect(result).not.toHaveProperty('removedFeatureEnabled')
-    expect(result).not.toHaveProperty('earthquakeLatitude')
-    expect(result).not.toHaveProperty('realtimeAlertsEnabled')
-  })
-
   it('falls back safely when a generic preference is invalid', () => {
-    expect(parsePersistedSettings({ ...DEFAULT_SETTINGS, theme: 'neon' })).toEqual(DEFAULT_SETTINGS)
+    const result = parsePersistedSettings({ ...DEFAULT_SETTINGS, theme: 'neon' })
+    expect(result.theme).toBe('system')
+    expect(result.providers).toHaveLength(PROVIDER_DESCRIPTORS.length)
   })
 })
 
@@ -86,6 +89,28 @@ describe('settingsPatchSchema', () => {
 
   it('rejects empty and unknown-only patches', () => {
     expect(settingsPatchSchema.safeParse({}).success).toBe(false)
-    expect(settingsPatchSchema.safeParse({ removedFeature: true }).success).toBe(false)
+    expect(settingsPatchSchema.safeParse({ unknownSetting: true }).success).toBe(false)
+  })
+
+  it('retains remote credentials when their delivery channel is disabled', () => {
+    const notification = {
+      ...DEFAULT_SETTINGS.notification,
+      telegram: { token: 'telegram-token', chatId: '123', enabled: false },
+      discord: { webhookUrl: 'https://discord.test/webhook', username: 'Bot', enabled: false },
+    }
+
+    expect(normalizeSettingsPatch({ notification }).notification).toMatchObject(notification)
+  })
+
+  it('migrates a legacy numeric Telegram chat ID to text', () => {
+    const result = parsePersistedSettings({
+      ...DEFAULT_SETTINGS,
+      notification: {
+        ...DEFAULT_SETTINGS.notification,
+        telegram: { ...DEFAULT_SETTINGS.notification.telegram, chatId: -100123 },
+      },
+    })
+
+    expect(result.notification.telegram.chatId).toBe('-100123')
   })
 })

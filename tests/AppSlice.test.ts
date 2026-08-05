@@ -17,6 +17,7 @@ describe('appSlice', () => {
       settings: { ...DEFAULT_SETTINGS, theme: 'light' },
       platform: 'linux',
       version: '1.0.0',
+      environmentApiKeys: {},
     }
     const hydrated = reducer(undefined, hydrate(payload))
     const repeated = reducer(hydrated, hydrate({ ...payload, version: '2.0.0' }))

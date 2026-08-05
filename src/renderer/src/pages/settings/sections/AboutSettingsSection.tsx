@@ -2,7 +2,7 @@
  * Renders application identity, author, repository, and support links.
  */
 
-import { Button } from 'antd'
+import { Button, Tag } from 'antd'
 import { ExternalLink } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { APP_AUTHOR, APP_AUTHOR_URL, APP_REPO, APP_REPO_URL } from '@shared/appInfo'
@@ -24,6 +24,7 @@ const AboutSettingsSection = (): React.JSX.Element => {
         <img src={logoUrl} alt="" />
         <h2>{t('app.name')}</h2>
         <p>{t('app.tagline')}</p>
+        <Tag>v{version}</Tag>
       </div>
       <section className={styles.settingGroup}>
         <div className={styles.settingRow}>
@@ -41,9 +42,6 @@ const AboutSettingsSection = (): React.JSX.Element => {
             icon={<ExternalLink size={14} />}
             onClick={() => void desktopActions.openExternal(APP_REPO_URL)}
           />
-        </div>
-        <div className={styles.settingRow}>
-          <SettingLabel title={t('settings.version')} description={`v${version}`} />
         </div>
       </section>
     </div>

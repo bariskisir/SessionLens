@@ -1,7 +1,7 @@
 {
-  "name": "lens",
-  "version": "1.4.0",
-  "description": "Lens desktop application",
+  "name": "session-lens",
+  "version": "1.0.0",
+  "description": "Session Lens desktop application",
   "main": "./out/main/index.js",
   "author": "bariskisir",
   "license": "MIT",
@@ -28,39 +28,40 @@
     "release": "npm run package:win && npm run package:linux"
   },
   "dependencies": {
+    "@hello-pangea/dnd": "^18.0.1",
     "electron-log": "5.4.4",
     "zod": "4.4.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.5",
+    "@biomejs/biome": "^2.5.7",
     "@reduxjs/toolkit": "2.12.0",
-    "@types/node": "26.1.1",
-    "@types/react": "19.2.17",
-    "@types/react-dom": "19.2.3",
-    "@vitejs/plugin-react": "6.0.3",
-    "antd": "6.5.1",
-    "electron": "43.2.0",
+    "@types/node": "^26.1.2",
+    "@types/react": "^19.2.18",
+    "@types/react-dom": "^19.2.4",
+    "@vitejs/plugin-react": "^6.0.5",
+    "antd": "^6.5.3",
+    "electron": "^43.3.0",
     "electron-builder": "26.15.3",
     "i18next": "26.3.6",
-    "jsdom": "29.1.1",
-    "lucide-react": "1.25.0",
+    "jsdom": "^30.0.1",
+    "lucide-react": "^1.28.0",
     "prettier": "3.9.6",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "react-i18next": "17.0.10",
+    "react-i18next": "^17.0.11",
     "react-redux": "9.3.0",
-    "sass": "1.101.3",
+    "sass": "^1.102.0",
     "typescript": "7.0.2",
-    "vite": "8.1.5",
-    "vite-plugin-electron": "1.1.0",
+    "vite": "^8.2.0",
+    "vite-plugin-electron": "^1.1.1",
     "vitest": "4.1.10"
   },
   "engines": {
     "node": ">=24.0.0"
   },
   "build": {
-    "appId": "com.bariskisir.lens",
-    "productName": "Lens",
+    "appId": "com.bariskisir.sessionlens",
+    "productName": "Session Lens",
     "asar": true,
     "directories": {
       "output": "release"
@@ -74,6 +75,18 @@
       {
         "from": "build/icon.png",
         "to": "icon.png"
+      },
+      {
+        "from": "build/notification-info.png",
+        "to": "notification-info.png"
+      },
+      {
+        "from": "build/notification-warning.png",
+        "to": "notification-warning.png"
+      },
+      {
+        "from": "build/notification-error.png",
+        "to": "notification-error.png"
       }
     ],
     "win": {
@@ -88,7 +101,7 @@
           ]
         }
       ],
-      "artifactName": "lens-${version}-windows-${arch}-setup.${ext}"
+      "artifactName": "session-lens-${version}-windows-${arch}-setup.${ext}"
     },
     "nsis": {
       "oneClick": false,
@@ -96,13 +109,13 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Lens"
+      "shortcutName": "Session Lens"
     },
     "mac": {
       "icon": "build/icon.png",
       "target": "dmg",
       "category": "public.app-category.productivity",
-      "artifactName": "Lens-${version}-mac-${arch}.${ext}"
+      "artifactName": "session-lens-${version}-mac-${arch}.${ext}"
     },
     "linux": {
       "icon": "build/icon.png",
@@ -110,7 +123,7 @@
         "AppImage"
       ],
       "category": "Utility",
-      "artifactName": "Lens-${version}-linux-${arch}.${ext}"
+      "artifactName": "session-lens-${version}-linux-${arch}.${ext}"
     }
   }
 }

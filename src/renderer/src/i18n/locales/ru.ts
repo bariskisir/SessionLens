@@ -4,8 +4,8 @@
 
 const ru = {
   app: {
-    name: 'Lens',
-    tagline: 'Сфокусированная оболочка настольного приложения.',
+    name: 'Session Lens',
+    tagline: 'Лимиты использования AI',
   },
   common: {
     loading: 'Загрузка…',
@@ -23,6 +23,15 @@ const ru = {
     title: 'Настройки',
     general: 'Общие',
     display: 'Отображение',
+    tooltip: 'Подсказка',
+    icon: 'Значок',
+    defaultModels: 'Модели по умолчанию',
+    smallModelSelector: 'Выбор малых моделей',
+    smallModelSelectorDescription:
+      'Фрагменты названий моделей через запятую, проверяемые слева направо. Используется для выбора самой лёгкой доступной модели при прогреве окон после сброса сеанса.',
+    providers: 'Провайдеры',
+    notifications: 'Уведомления',
+    remoteChannels: 'Удалённые каналы',
     updates: 'Обновления',
     logging: 'Логирование',
     about: 'О приложении',
@@ -31,7 +40,7 @@ const ru = {
     timeFormat: 'Формат времени',
     timeFormatDescription: 'Выберите 12-часовой или 24-часовой формат.',
     startOnStartup: 'Запускать при входе',
-    startOnStartupDescription: 'Автоматически запускать Lens при входе в систему.',
+    startOnStartupDescription: 'Автоматически запускать Session Lens при входе в систему.',
     timeFormats: {
       '24-hour': '24-часовой',
       '12-hour': '12-часовой',
@@ -53,7 +62,7 @@ const ru = {
     resetZoom: 'Сбросить масштаб',
     traySettings: 'Настройки системного трея',
     showTrayIcon: 'Показывать значок в трее',
-    showTrayIconDescription: 'Показывать Lens в системном трее.',
+    showTrayIconDescription: 'Показывать Session Lens в системном трее.',
     minimizeToTrayOnClose: 'Сворачивать в трей при закрытии',
     minimizeToTrayOnCloseDescription:
       'Скрывать окно в системном трее вместо выхода из приложения при закрытии.',
@@ -61,7 +70,7 @@ const ru = {
     alwaysOnTop: 'Поверх всех окон',
     checkUpdatesOnStartup: 'Проверять обновления при запуске',
     checkUpdatesOnStartupDescription:
-      'При запуске приложения автоматически проверять новую версию Lens на GitHub.',
+      'При запуске приложения автоматически проверять новую версию Session Lens на GitHub.',
     unattendedUpdates: 'Автоматические обновления без участия пользователя',
     unattendedUpdatesDescription:
       'Загружать обновления в фоновом режиме, устанавливать их без запросов и автоматически перезапускать приложение.',
@@ -90,6 +99,64 @@ const ru = {
     },
     author: 'Автор',
     sourceCode: 'Исходный код',
+    iconSettings: 'Оформление',
+    iconLayout: 'Макет значка',
+  },
+  providers: {
+    displayOrder: 'Порядок отображения',
+    displayOrderDescription:
+      'Перетаскивайте провайдеров, чтобы задать порядок их отображения в значке трея и подсказке.',
+    enabled: 'Включено',
+    refreshToken: 'Использовать токен обновления',
+    warmWindow: 'Окно прогрева',
+    apiKey: 'Ключ API',
+    envKeyDescription:
+      'Этот ключ загружается из переменной окружения и не может быть изменён здесь.',
+    envKeyPlaceholder: 'Из переменной окружения',
+  },
+  icon: {
+    tooltipScale: 'Масштаб подсказки',
+    tooltipScaleDescription: 'Настройте размер подсказки трея.',
+    layoutMode: 'Макет значка',
+    layoutModeDescription: 'Выберите, как полосы использования заполняют значок трея.',
+    layoutModes: {
+      auto: 'Авто',
+      manual: 'Вручную',
+    },
+    dropHint: 'Перетащите провайдеров сюда',
+    totalWeight: 'Итого',
+    shelfEmpty: 'Все полосовые провайдеры в значке',
+    removeBar: 'Удалить полосу',
+  },
+  notifications: {
+    enabled: 'Включить уведомления',
+    enabledDescription: 'Уведомлять, когда использование достигает заданных порогов.',
+    highThreshold: 'Высокий порог',
+    highThresholdDescription: 'Процент использования, вызывающий высокое предупреждение.',
+    criticalThreshold: 'Критический порог',
+    criticalThresholdDescription: 'Процент использования, вызывающий критическое предупреждение.',
+    refreshInterval: 'Интервал обновления',
+    refreshIntervalDescription: 'Как часто автоматически обновляется использование.',
+    minutes: 'мин',
+    test: 'Тестовое уведомление',
+    testDescription: 'Отправить примерное уведомление через каждый включённый канал.',
+    testButton: 'Отправить тест',
+    telegram: {
+      enabled: 'Включить Telegram',
+      enabledDescription: 'Доставлять уведомления в чат Telegram.',
+      token: 'Токен бота',
+      tokenDescription: 'Токен, выданный BotFather для вашего бота.',
+      chatId: 'ID чата',
+      chatIdDescription: 'Идентификатор чата, получающего уведомления.',
+    },
+    discord: {
+      enabled: 'Включить Discord',
+      enabledDescription: 'Доставлять уведомления в канал Discord через вебхук.',
+      webhookUrl: 'URL вебхука',
+      webhookUrlDescription: 'URL вебхука, созданный для вашего канала Discord.',
+      username: 'Имя пользователя вебхука',
+      usernameDescription: 'Имя, отображаемое для сообщений вебхука.',
+    },
   },
   locales: {
     en: 'Английский',
