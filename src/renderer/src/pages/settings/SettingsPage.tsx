@@ -4,6 +4,7 @@
  */
 
 import {
+  Activity,
   Bell,
   Bot,
   Info,
@@ -27,6 +28,7 @@ import IconSettingsSection from './sections/IconSettingsSection'
 import LoggingSettingsSection from './sections/LoggingSettingsSection'
 import NotificationsSettingsSection from './sections/NotificationsSettingsSection'
 import ProvidersSettingsSection from './sections/ProvidersSettingsSection'
+import TelemetrySettingsSection from './sections/TelemetrySettingsSection'
 import UpdatesSettingsSection from './sections/UpdatesSettingsSection'
 import styles from './SettingsPage.module.scss'
 
@@ -52,6 +54,7 @@ const SettingsPage = (): React.JSX.Element => {
     { key: 'icon', label: t('settings.icon'), icon: <Palette size={17} /> },
     { key: 'defaultModels', label: t('settings.defaultModels'), icon: <Bot size={17} /> },
     { key: 'updates', label: t('settings.updates'), icon: <RefreshCw size={17} /> },
+    { key: 'telemetry', label: t('settings.telemetry'), icon: <Activity size={17} /> },
     { key: 'logging', label: t('settings.logging'), icon: <ScrollText size={17} /> },
     { key: 'about', label: t('settings.about'), icon: <Info size={17} /> },
   ]
@@ -65,6 +68,7 @@ const SettingsPage = (): React.JSX.Element => {
     icon: IconSettingsSection,
     defaultModels: DefaultModelsSettingsSection,
     updates: UpdatesSettingsSection,
+    telemetry: TelemetrySettingsSection,
     logging: LoggingSettingsSection,
     about: AboutSettingsSection,
   }

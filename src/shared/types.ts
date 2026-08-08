@@ -135,6 +135,7 @@ export interface AppSettings {
   showTrayIcon: boolean
   minimizeToTrayOnClose: boolean
   autoUpdate: boolean
+  telemetryEnabled: boolean
   unattendedUpdates: boolean
   logLevel: LogLevel
   refresh: RefreshSettings

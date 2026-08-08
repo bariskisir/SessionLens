@@ -33,6 +33,7 @@ const zh = {
     notifications: '通知',
     remoteChannels: '远程渠道',
     updates: '更新',
+    telemetry: '遥测',
     logging: '日志',
     about: '关于',
     interfaceLanguage: '界面语言',
@@ -80,6 +81,9 @@ const zh = {
     installNow: '安装并重启',
     openDownloadPage: '打开下载页面',
     releaseNotes: '发行说明',
+    telemetryCollection: '共享匿名使用情况遥测',
+    telemetryDescription:
+      '应用启动时会发送匿名安装标识、版本、平台和界面语言，用于统计活跃用户。Microsoft 会根据连接 IP 推断大致的国家/地区和城市。不会发送会话内容。',
     updateError: '更新检查失败。',
     version: '版本 {{version}}',
     logLevel: '日志级别',

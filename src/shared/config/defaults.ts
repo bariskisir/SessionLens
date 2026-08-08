@@ -26,6 +26,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   showTrayIcon: true,
   minimizeToTrayOnClose: true,
   autoUpdate: true,
+  telemetryEnabled: true,
   unattendedUpdates: true,
   logLevel: 'info',
   refresh: { minute: 5 },

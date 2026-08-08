@@ -10,6 +10,7 @@ import { configureStartOnLogin, isHiddenStartupLaunch } from './startup'
 import AppUpdater from './services/AppUpdater'
 import LoggerService from './services/LoggerService'
 import StorageService from './services/StorageService'
+import TelemetryService from './services/TelemetryService'
 import TrayService from './services/TrayService'
 import WindowService from './services/WindowService'
 import UsageAggregator from './services/usage/UsageAggregator'
@@ -40,6 +41,7 @@ if (process.platform === 'win32') {
 
 const applicationPaths = configureApplicationPaths()
 const windowService = new WindowService(applicationPaths.dataRoot)
+const telemetryService = new TelemetryService(applicationPaths.dataRoot)
 const hasSingleInstanceLock = app.requestSingleInstanceLock()
 let loggerService: LoggerService | null = null
 let trayService: TrayService | null = null
@@ -63,6 +65,17 @@ const openApplicationWindow = async (startHidden = false): Promise<void> => {
 
   const logger = new LoggerService(applicationPaths.logsRoot, settings.logLevel)
   loggerService = logger
+  void telemetryService
+    .trackStartup({
+      appName: 'SessionLens',
+      enabled: settings.telemetryEnabled,
+      version: app.getVersion(),
+      platform: process.platform,
+      locale: settings.uiLanguage,
+    })
+    .catch((error: unknown) => {
+      logger.warn('TelemetryService', 'Startup telemetry could not be sent.', error)
+    })
 
   const updater = new AppUpdater(logger)
   updater.applySettings(settings)

@@ -19,6 +19,7 @@ export type SettingsSection =
   | 'providers'
   | 'notifications'
   | 'updates'
+  | 'telemetry'
   | 'about'
   | 'logging'
 export interface AppState {

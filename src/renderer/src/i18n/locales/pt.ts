@@ -33,6 +33,7 @@ const pt = {
     notifications: 'Notificações',
     remoteChannels: 'Canais remotos',
     updates: 'Atualizações',
+    telemetry: 'Telemetria',
     logging: 'Registo',
     about: 'Sobre',
     interfaceLanguage: 'Idioma da interface',
@@ -83,6 +84,9 @@ const pt = {
     installNow: 'Instalar e reiniciar',
     openDownloadPage: 'Abrir página de download',
     releaseNotes: 'Notas da versão',
+    telemetryCollection: 'Partilhar telemetria de utilização anónima',
+    telemetryDescription:
+      'Ao iniciar a aplicação, são enviados um identificador de instalação anónimo, a versão, a plataforma e o idioma da interface para contar utilizadores ativos. A Microsoft obtém um país e uma cidade aproximados a partir do IP da ligação. Não são enviados conteúdos de sessão.',
     updateError: 'A verificação de atualização falhou.',
     version: 'Versão {{version}}',
     logLevel: 'Nível de registo',

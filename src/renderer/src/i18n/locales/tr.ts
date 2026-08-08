@@ -30,6 +30,7 @@ const tr = {
     notifications: 'Bildirimler',
     remoteChannels: 'Uzak kanallar',
     updates: 'Güncellemeler',
+    telemetry: 'Telemetri',
     logging: 'Günlükleme',
     about: 'Hakkında',
     smallModelSelector: 'Küçük model seçici',
@@ -82,6 +83,9 @@ const tr = {
     installNow: 'Kur ve yeniden başlat',
     openDownloadPage: 'İndirme sayfasını aç',
     releaseNotes: 'Sürüm notları',
+    telemetryCollection: 'Anonim kullanım telemetrisini paylaş',
+    telemetryDescription:
+      'Etkin kullanıcı sayısını takip etmek için uygulama açılışında anonim bir kurulum kimliği, sürüm, platform ve arayüz dili gönderilir. Microsoft bağlantı IP adresinden yaklaşık ülke ve şehir bilgisini türetir. Oturum içeriği gönderilmez.',
     updateError: 'Güncelleme denetimi başarısız oldu.',
     version: 'Sürüm {{version}}',
     logLevel: 'Günlük düzeyi',
