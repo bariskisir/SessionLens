@@ -78,7 +78,8 @@ export default class ThresholdNotifier {
           current.resetAt != null &&
           previous.resetAt != null &&
           new Date(current.resetAt).getTime() > new Date(previous.resetAt).getTime()
-        if (currentFraction <= 0.05 || resetTimestampAdvanced) {
+        const resetToNearZero = currentFraction <= 0.01 && previousFraction > 0.01
+        if (resetToNearZero || resetTimestampAdvanced) {
           notifications.push({
             level: 'reset',
             message: `${current.providerName} ${label} reset to ${displayPercent(currentFraction)}%`,
