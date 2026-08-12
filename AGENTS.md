@@ -117,7 +117,7 @@ SessionLens/
 |           `-- assets/styles/           # Shared SCSS variables and resets
 |-- tests/                               # 15 Vitest files / 105 tests at time of writing
 |-- build/                               # Product and notification icons used by the installer
-|-- vite.config.ts
+|-- vite.config.mts
 |-- vitest.config.mts
 |-- tsconfig.json
 |-- tsconfig.node.json

@@ -51,6 +51,7 @@ const electronMocks = vi.hoisted(() => {
     menuTemplates: [] as unknown[][],
     imageEmpty: false,
     tooltipWindows: [] as MockTooltip[],
+    notifications: [] as Array<{ body?: string; title?: string; silent?: boolean }>,
     pendingLoad: null as Promise<void> | null,
     quit: vi.fn(),
   }
@@ -89,6 +90,15 @@ vi.mock('electron', () => ({
       electronMocks.instances.push(this)
     }
   },
+  Notification: class {
+    public constructor(
+      public readonly options: { body?: string; title?: string; silent?: boolean },
+    ) {
+      electronMocks.notifications.push(options)
+    }
+
+    public show(): void {}
+  },
 }))
 
 /** Creates the BrowserWindow capabilities used by TrayService. */
@@ -114,6 +124,7 @@ describe('TrayService', () => {
     electronMocks.instances.length = 0
     electronMocks.menuTemplates.length = 0
     electronMocks.tooltipWindows.length = 0
+    electronMocks.notifications.length = 0
     electronMocks.pendingLoad = null
     electronMocks.imageEmpty = false
     electronMocks.quit.mockClear()
@@ -177,6 +188,28 @@ describe('TrayService', () => {
 
     expect(tray?.destroy).toHaveBeenCalledOnce()
     expect(service.shouldMinimizeOnClose()).toBe(false)
+  })
+
+  it('delivers native notifications through the OS toast channel', () => {
+    const service = new TrayService(
+      createWindow(),
+      { showTrayIcon: true, minimizeToTrayOnClose: true },
+      createLogger(),
+    )
+
+    expect(service.showNotification('critical', 'Codex Daily at 100%')).toBe(true)
+    expect(electronMocks.notifications[0]?.body).toBe('Codex Daily at 100%')
+  })
+
+  it('declines native notifications while the tray icon is unavailable', () => {
+    const service = new TrayService(
+      createWindow(),
+      { showTrayIcon: false, minimizeToTrayOnClose: false },
+      createLogger(),
+    )
+
+    expect(service.showNotification('critical', 'Codex Daily at 100%')).toBe(false)
+    expect(electronMocks.notifications).toHaveLength(0)
   })
 
   it('builds an unseparated Settings, Refresh, Exit menu and opens settings', () => {

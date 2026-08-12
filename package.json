@@ -1,6 +1,6 @@
 {
   "name": "session-lens",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Session Lens desktop application",
   "main": "./out/main/index.js",
   "author": "bariskisir",
@@ -13,7 +13,7 @@
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
     "typecheck:node": "tsc --noEmit -p tsconfig.node.json",
     "typecheck:web": "tsc --noEmit -p tsconfig.web.json",
-    "lint": "biome lint src tests vite.config.ts vitest.config.mts",
+    "lint": "biome lint src tests vite.config.mts vitest.config.mts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "test": "vitest run",

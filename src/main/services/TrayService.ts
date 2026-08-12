@@ -3,7 +3,7 @@
  */
 
 import { join } from 'node:path'
-import { app, BrowserWindow, Menu, nativeImage, screen, Tray } from 'electron'
+import { app, BrowserWindow, Menu, nativeImage, Notification, screen, Tray } from 'electron'
 import type { NotificationLevel } from '@shared/types'
 import { IpcChannel } from '@shared/IpcChannel'
 import type { AppSettings, TooltipCard } from '@shared/types'
@@ -68,13 +68,9 @@ export default class TrayService {
     return !this.quitting && this.settings.minimizeToTrayOnClose && this.tray !== null
   }
 
-  public showNotification(level: NotificationLevel, message: string): boolean {
+  public showNotification(_level: NotificationLevel, message: string): boolean {
     if (!this.tray) return false
-    this.tray.displayBalloon({
-      title: '',
-      content: message,
-      iconType: level === 'critical' ? 'error' : level === 'high' ? 'warning' : 'info',
-    })
+    new Notification({ body: message, silent: false }).show()
     return true
   }
 

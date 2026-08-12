@@ -20,7 +20,7 @@
     }
   },
   "include": [
-    "vite.config.ts",
+    "vite.config.mts",
     "vitest.config.mts",
     "eslint.config.mjs",
     "src/main/**/*.ts",
