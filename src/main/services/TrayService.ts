@@ -15,11 +15,41 @@ type TraySettings = Pick<AppSettings, 'showTrayIcon' | 'minimizeToTrayOnClose'>
 
 const TOOLTIP_MARGIN = 8
 
+/** Maximum wait for the hidden tooltip renderer to answer a measure request. */
+const TOOLTIP_MEASURE_TIMEOUT_MS = 3_000
+
+/**
+ * Rejects when the source promise does not settle within the timeout.
+ *
+ * @param promise - Source promise to observe
+ * @param timeoutMs - Timeout duration in milliseconds
+ * @returns The source promise's settlement, or a rejection on timeout
+ */
+export function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<T> {
+  return new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error(`Operation timed out after ${timeoutMs} ms.`)),
+      timeoutMs,
+    )
+    promise.then(
+      (value) => {
+        clearTimeout(timer)
+        resolve(value)
+      },
+      (error: unknown) => {
+        clearTimeout(timer)
+        reject(error)
+      },
+    )
+  })
+}
+
 export default class TrayService {
   private tray: Tray | null = null
   private tooltip: BrowserWindow | null = null
   private tooltipLoad: Promise<BrowserWindow | null> | null = null
   private tooltipData: { cards: TooltipCard[]; scale: number } = { cards: [], scale: 100 }
+  private activeNotifications = new Set<Notification>()
   private hovering = false
   private refreshUsage: (() => void) | null = null
   private settings: TraySettings
@@ -54,6 +84,14 @@ export default class TrayService {
 
   public setTooltip(cards: TooltipCard[], scale: number): void {
     this.tooltipData = { cards, scale }
+    // With no data to display, keep the default tray glyph and never open the
+    // popup, even when hovering.
+    if (!cards.some((card) => !card.hide)) {
+      this.setUsage([])
+      if (this.tooltip && !this.tooltip.isDestroyed() && this.tooltip.isVisible()) {
+        this.tooltip.hide()
+      }
+    }
   }
 
   public setTooltipScale(scale: number): void {
@@ -70,13 +108,36 @@ export default class TrayService {
 
   public showNotification(_level: NotificationLevel, message: string): boolean {
     if (!this.tray) return false
-    new Notification({ body: message, silent: false }).show()
+    const notification = new Notification({ body: message, silent: false })
+    // Reading the toast only dismisses it: it must never open a window or
+    // launch a fresh app instance.
+    notification.on('click', () => {
+      this.logger.info('TrayService', 'Notification read and dismissed.', { body: message })
+      this.removeNotification(notification)
+    })
+    this.activeNotifications.add(notification)
+    notification.show()
     return true
   }
 
   public prepareToQuit(): void {
     this.quitting = true
+    // Leave no stale toasts in the Action Center: clicking one after the app
+    // exits would launch a bare executable (dev) or a second app instance.
+    for (const notification of this.activeNotifications) {
+      this.removeNotification(notification)
+    }
     this.destroyTrayIcon()
+  }
+
+  /** Dismisses a toast from the screen and, on Windows, from the Action Center. */
+  private removeNotification(notification: Notification): void {
+    this.activeNotifications.delete(notification)
+    try {
+      notification.close()
+    } catch (error) {
+      this.logger.warn('TrayService', 'Notification could not be dismissed.', error)
+    }
   }
 
   public dispose(): void {
@@ -101,6 +162,9 @@ export default class TrayService {
       tray.on('click', () => this.showWindow())
       tray.on('mouse-enter', () => this.onTrayEnter())
       tray.on('mouse-leave', () => this.onTrayLeave())
+      // Windows also shows a native hover tooltip for tray icons; suppress it
+      // so it can never overlap the custom popup.
+      if (process.platform === 'win32') tray.setToolTip('')
       this.tray = tray
       // Pre-create the popup so the first hover is as instant as later ones.
       void this.ensureTooltipWindow()
@@ -111,15 +175,16 @@ export default class TrayService {
   }
 
   private onTrayEnter(): void {
-    if (this.hovering) return
+    // A missed mouse-leave must not disable the popup permanently: skip only
+    // while it is already open, and attempt the show for every other enter.
+    if (this.tooltip?.isVisible()) return
     this.hovering = true
     void this.showTooltip()
   }
 
   private onTrayLeave(): void {
-    if (!this.hovering) return
     this.hovering = false
-    this.tooltip?.hide()
+    if (this.tooltip && !this.tooltip.isDestroyed()) this.tooltip.hide()
   }
 
   /** Returns the pre-created popup, creating and loading it once on first use. */
@@ -147,6 +212,9 @@ export default class TrayService {
   /** Renders the cards into the ready popup and shows it next to the tray. */
   private async showTooltip(): Promise<void> {
     if (!this.tray || this.quitting) return
+    // No usage data yet (offline or first refresh pending): an empty popup is
+    // noise, so skip it and keep the default tray glyph.
+    if (!this.tooltipData.cards.some((card) => !card.hide)) return
     const tooltip = await this.ensureTooltipWindow()
     if (!tooltip || tooltip.isDestroyed() || tooltip.isVisible()) return
     if (this.quitting || !this.hovering) return
@@ -155,16 +223,25 @@ export default class TrayService {
       size = await this.measureTooltip(tooltip)
     } catch (error) {
       this.logger.warn('TrayService', 'Tray tooltip content could not be rendered.', error)
+      // A hung or dead renderer must not poison every future hover: drop the
+      // popup so the next hover rebuilds a fresh window.
+      this.invalidateTooltipWindow(tooltip)
       return
     }
     if (this.tooltip !== tooltip || tooltip.isDestroyed() || tooltip.isVisible()) return
     if (this.quitting || !this.hovering) return
-    this.placeAndShow(tooltip, size)
+    try {
+      this.placeAndShow(tooltip, size)
+    } catch (error) {
+      this.logger.warn('TrayService', 'Tray tooltip popup could not be shown.', error)
+      this.invalidateTooltipWindow(tooltip)
+    }
   }
 
   private createTooltipWindow(): BrowserWindow {
-    this.tooltip?.destroy()
+    const previous = this.tooltip
     this.tooltip = null
+    if (previous && !previous.isDestroyed()) previous.destroy()
     const tooltip = new BrowserWindow({
       width: 280,
       height: 120,
@@ -187,16 +264,23 @@ export default class TrayService {
     // Keep the renderer fully active while hidden so executeJavaScript still works
     // after hide/show cycles (a background-throttled renderer rejects scripts).
     tooltip.webContents.setBackgroundThrottling(false)
+    // If the popup renderer dies while hidden, drop the window so the next
+    // hover recreates it instead of failing silently forever.
+    tooltip.webContents.on('render-process-gone', () => this.invalidateTooltipWindow(tooltip))
     this.tooltip = tooltip
     return tooltip
   }
 
   /** Renders the cards and returns the natural panel size. */
   private async measureTooltip(tooltip: BrowserWindow): Promise<{ width: number; height: number }> {
-    const json = JSON.stringify(this.tooltipData)
-    const b64 = Buffer.from(json, 'utf-8').toString('base64')
-    const measured = (await tooltip.webContents.executeJavaScript(
-      `(()=>{try{const d=JSON.parse(atob("${b64}"));window.setTooltip(d)}catch(e){return{error:String(e)}}const p=document.querySelector('.panel');if(!p)return{error:'no panel'};const r=p.getBoundingClientRect();return{width:Math.ceil(r.width),height:Math.ceil(r.height)}})()`,
+    // Inject the payload as a JSON literal (safe for quotes, newlines, and
+    // non-ASCII text) instead of a base64 round-trip that garbled unicode.
+    const payload = JSON.stringify(this.tooltipData)
+    const measured = (await withTimeout(
+      tooltip.webContents.executeJavaScript(
+        `(()=>{try{window.setTooltip(${payload})}catch(e){return{error:String(e)}}const p=document.querySelector('.panel');if(!p)return{error:'no panel'};const r=p.getBoundingClientRect();return{width:Math.ceil(r.width),height:Math.ceil(r.height)}})()`,
+      ),
+      TOOLTIP_MEASURE_TIMEOUT_MS,
     )) as { width?: number; height?: number; error?: string }
     if (measured.error) throw new Error(`Tooltip render failed: ${measured.error}`)
     return {
@@ -254,11 +338,18 @@ export default class TrayService {
     return sourceImage.resize({ width: TRAY_ICON_SIZE, height: TRAY_ICON_SIZE })
   }
 
+  /** Drops a broken popup so the next hover rebuilds it from scratch. */
+  private invalidateTooltipWindow(stale: BrowserWindow): void {
+    if (this.tooltip !== stale) return
+    this.destroyTooltipWindow()
+  }
+
   /** Destroys the popup so it consumes no memory while disabled or quitting. */
   private destroyTooltipWindow(): void {
-    this.tooltip?.destroy()
+    const tooltip = this.tooltip
     this.tooltip = null
     this.tooltipLoad = null
+    if (tooltip && !tooltip.isDestroyed()) tooltip.destroy()
   }
 
   private destroyTrayIcon(): void {

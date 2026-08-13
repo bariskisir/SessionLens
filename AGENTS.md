@@ -263,6 +263,14 @@ emitted in severity order (critical, high, reset). Delivery covers the native OS
 every enabled remote channel (Telegram via bot token/chat ID, Discord via webhook). The
 `notification:test` IPC channel sends a test alert through the same paths.
 
+Native toasts are read-only: clicking one only dismisses it — never opening a window or launching
+a fresh instance. Outstanding toasts are closed on quit so stale Action Center entries cannot
+relaunch a bare executable (dev) or a second app instance. The Windows toast activator is
+registered eagerly at startup (`Notification.isSupported()`) so toast clicks route into the
+running process, and COM activation launches (`-Embedding`) start hidden like `--hidden`.
+In development the activator's `LocalServer32` launch command is repaired at startup
+(`ToastActivatorRepair`) so a cold toast click starts the app instead of Electron's default screen.
+
 ## Persistence and AppData
 
 `ApplicationPaths` separates durable data from Chromium runtime state:
@@ -303,6 +311,10 @@ every enabled remote channel (Telegram via bot token/chat ID, Discord via webhoo
   events ignored) that is hidden on hover-out and destroyed only on dispose. Its renderer keeps
   background throttling disabled so `executeJavaScript` measurement keeps working after
   hide/show cycles.
+- The popup stays closed and the tray glyph stays default while no usage data has been collected
+  yet (offline or before the first refresh); hovering does nothing until the first card exists.
+  A hung or dead popup renderer is discarded and rebuilt on the next hover, and the
+  Windows-native tray hover tooltip is suppressed so it cannot overlap the custom popup.
 - Windows window animations are disabled via the `wm-window-animations-disabled` switch.
 - The window is frameless (Windows/Linux) with a custom titlebar; macOS uses a hidden title bar
   with overlay controls.

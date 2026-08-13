@@ -5,7 +5,8 @@
 
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { BrowserWindow } from 'electron'
-import TrayService from '../src/main/services/TrayService'
+import type { TooltipCard } from '@shared/types'
+import TrayService, { withTimeout } from '../src/main/services/TrayService'
 import type LoggerService from '../src/main/services/LoggerService'
 
 const electronMocks = vi.hoisted(() => {
@@ -25,20 +26,27 @@ const electronMocks = vi.hoisted(() => {
 
   class MockTooltip {
     private destroyed = false
+    private visible = false
     public readonly executeJavaScript = vi.fn(() => Promise.resolve({ width: 280, height: 120 }))
     public readonly webContents = {
       executeJavaScript: this.executeJavaScript,
       setBackgroundThrottling: vi.fn(),
+      on: vi.fn(),
     }
     public readonly isDestroyed = vi.fn(() => this.destroyed)
-    public readonly isVisible = vi.fn(() => false)
+    public readonly isVisible = vi.fn(() => this.visible)
     public readonly destroy = vi.fn(() => {
       this.destroyed = true
+      this.visible = false
     })
     public readonly loadFile = vi.fn(() => electronMocks.pendingLoad ?? Promise.resolve())
     public readonly loadURL = vi.fn(() => electronMocks.pendingLoad ?? Promise.resolve())
-    public readonly showInactive = vi.fn()
-    public readonly hide = vi.fn()
+    public readonly showInactive = vi.fn(() => {
+      this.visible = true
+    })
+    public readonly hide = vi.fn(() => {
+      this.visible = false
+    })
     public readonly setBounds = vi.fn()
     public readonly setAlwaysOnTop = vi.fn()
     public readonly setIgnoreMouseEvents = vi.fn()
@@ -51,7 +59,12 @@ const electronMocks = vi.hoisted(() => {
     menuTemplates: [] as unknown[][],
     imageEmpty: false,
     tooltipWindows: [] as MockTooltip[],
-    notifications: [] as Array<{ body?: string; title?: string; silent?: boolean }>,
+    notifications: [] as Array<{
+      options: { body?: string; title?: string; silent?: boolean }
+      handlers: Map<string, () => void>
+      close: ReturnType<typeof vi.fn>
+      show: () => void
+    }>,
     pendingLoad: null as Promise<void> | null,
     quit: vi.fn(),
   }
@@ -80,6 +93,7 @@ vi.mock('electron', () => ({
       isEmpty: () => electronMocks.imageEmpty,
       resize: vi.fn(() => ({ resized: true })),
     })),
+    createFromBuffer: vi.fn(() => ({ bufferPng: true })),
   },
   screen: {
     getDisplayNearestPoint: vi.fn(() => ({ workArea: { x: 0, y: 0, width: 1920, height: 1080 } })),
@@ -91,10 +105,16 @@ vi.mock('electron', () => ({
     }
   },
   Notification: class {
+    public readonly handlers = new Map<string, () => void>()
+    public readonly close = vi.fn()
     public constructor(
       public readonly options: { body?: string; title?: string; silent?: boolean },
     ) {
-      electronMocks.notifications.push(options)
+      electronMocks.notifications.push(this)
+    }
+
+    public on(event: string, listener: () => void): void {
+      this.handlers.set(event, listener)
     }
 
     public show(): void {}
@@ -114,10 +134,20 @@ const createWindow = (): BrowserWindow =>
 
 /** Creates the logging capability used by TrayService. */
 const createLogger = (): LoggerService =>
-  ({ error: vi.fn(), warn: vi.fn() }) as unknown as LoggerService
+  ({ error: vi.fn(), warn: vi.fn(), info: vi.fn() }) as unknown as LoggerService
 
 /** Flushes the pending microtask chain of the async popup show. */
 const flushAsync = (): Promise<void> => new Promise((resolve) => setImmediate(resolve))
+
+/** One representative metric card used by the popup tests. */
+const sampleCard: TooltipCard = {
+  title: 'Codex',
+  plan: 'Pro',
+  metrics: [{ label: 'Daily', percent: 42, detail: '2h', sub: null }],
+  lines: [],
+  icon: 'codex',
+  notice: null,
+}
 
 describe('TrayService', () => {
   beforeEach(() => {
@@ -198,7 +228,7 @@ describe('TrayService', () => {
     )
 
     expect(service.showNotification('critical', 'Codex Daily at 100%')).toBe(true)
-    expect(electronMocks.notifications[0]?.body).toBe('Codex Daily at 100%')
+    expect(electronMocks.notifications[0]?.options.body).toBe('Codex Daily at 100%')
   })
 
   it('declines native notifications while the tray icon is unavailable', () => {
@@ -210,6 +240,35 @@ describe('TrayService', () => {
 
     expect(service.showNotification('critical', 'Codex Daily at 100%')).toBe(false)
     expect(electronMocks.notifications).toHaveLength(0)
+  })
+
+  it('dismisses a read toast from the screen and the Action Center', () => {
+    const service = new TrayService(
+      createWindow(),
+      { showTrayIcon: true, minimizeToTrayOnClose: true },
+      createLogger(),
+    )
+
+    expect(service.showNotification('critical', 'Codex Daily at 100%')).toBe(true)
+    const toast = electronMocks.notifications[0]
+    toast?.handlers.get('click')?.()
+    expect(toast?.close).toHaveBeenCalledOnce()
+  })
+
+  it('dismisses outstanding toasts when the application quits', () => {
+    const service = new TrayService(
+      createWindow(),
+      { showTrayIcon: true, minimizeToTrayOnClose: true },
+      createLogger(),
+    )
+
+    service.showNotification('high', 'first message')
+    service.showNotification('critical', 'second message')
+    const [first, second] = electronMocks.notifications
+
+    service.prepareToQuit()
+    expect(first?.close).toHaveBeenCalledOnce()
+    expect(second?.close).toHaveBeenCalledOnce()
   })
 
   it('builds an unseparated Settings, Refresh, Exit menu and opens settings', () => {
@@ -236,6 +295,7 @@ describe('TrayService', () => {
     )
     const tray = electronMocks.instances[0]
     expect(electronMocks.tooltipWindows).toHaveLength(1)
+    service.setTooltip([sampleCard], 100)
 
     tray?.handlers.get('mouse-enter')?.()
     await flushAsync()
@@ -263,6 +323,7 @@ describe('TrayService', () => {
     )
     const tray = electronMocks.instances[0]
     const tooltip = electronMocks.tooltipWindows[0]
+    service.setTooltip([sampleCard], 100)
 
     tray?.handlers.get('mouse-enter')?.()
     await flushAsync()
@@ -283,6 +344,7 @@ describe('TrayService', () => {
       createLogger(),
     )
     const tray = electronMocks.instances[0]
+    service.setTooltip([sampleCard], 100)
 
     tray?.handlers.get('mouse-enter')?.()
     tray?.handlers.get('mouse-enter')?.()
@@ -300,5 +362,135 @@ describe('TrayService', () => {
     expect(tooltip?.showInactive).toHaveBeenCalledTimes(2)
 
     service.dispose()
+  })
+
+  it('keeps the default tray glyph and skips the popup while no data exists', async () => {
+    const service = new TrayService(
+      createWindow(),
+      { showTrayIcon: true, minimizeToTrayOnClose: true },
+      createLogger(),
+    )
+    const tray = electronMocks.instances[0]
+
+    service.setTooltip([], 100)
+    expect(tray?.setImage).toHaveBeenCalledWith({ resized: true })
+
+    tray?.handlers.get('mouse-enter')?.()
+    await flushAsync()
+    const tooltip = electronMocks.tooltipWindows[0]
+    expect(tooltip?.executeJavaScript).not.toHaveBeenCalled()
+    expect(tooltip?.showInactive).not.toHaveBeenCalled()
+
+    service.dispose()
+  })
+
+  it('treats only-hidden cards as missing data', async () => {
+    const service = new TrayService(
+      createWindow(),
+      { showTrayIcon: true, minimizeToTrayOnClose: true },
+      createLogger(),
+    )
+    const tray = electronMocks.instances[0]
+
+    service.setTooltip([{ ...sampleCard, hide: true }], 100)
+    expect(tray?.setImage).toHaveBeenCalledWith({ resized: true })
+
+    tray?.handlers.get('mouse-enter')?.()
+    await flushAsync()
+    expect(electronMocks.tooltipWindows[0]?.showInactive).not.toHaveBeenCalled()
+
+    service.dispose()
+  })
+
+  it('opens the popup as soon as the first card arrives', async () => {
+    const service = new TrayService(
+      createWindow(),
+      { showTrayIcon: true, minimizeToTrayOnClose: true },
+      createLogger(),
+    )
+    const tray = electronMocks.instances[0]
+    const tooltip = electronMocks.tooltipWindows[0]
+
+    tray?.handlers.get('mouse-enter')?.()
+    await flushAsync()
+    expect(tooltip?.showInactive).not.toHaveBeenCalled()
+
+    service.setTooltip([sampleCard], 100)
+    tray?.handlers.get('mouse-enter')?.()
+    await flushAsync()
+    expect(tooltip?.showInactive).toHaveBeenCalledOnce()
+
+    service.dispose()
+  })
+
+  it('rebuilds the popup on the next hover when rendering fails', async () => {
+    const service = new TrayService(
+      createWindow(),
+      { showTrayIcon: true, minimizeToTrayOnClose: true },
+      createLogger(),
+    )
+    const tray = electronMocks.instances[0]
+    const tooltip = electronMocks.tooltipWindows[0]
+    service.setTooltip([sampleCard], 100)
+
+    tooltip?.executeJavaScript.mockRejectedValueOnce(new Error('Render frame was disposed'))
+    tray?.handlers.get('mouse-enter')?.()
+    await flushAsync()
+    expect(tooltip?.showInactive).not.toHaveBeenCalled()
+    expect(tooltip?.destroy).toHaveBeenCalledOnce()
+
+    tray?.handlers.get('mouse-enter')?.()
+    await flushAsync()
+    const rebuilt = electronMocks.tooltipWindows[1]
+    expect(rebuilt).toBeDefined()
+    expect(rebuilt?.executeJavaScript).toHaveBeenCalled()
+    expect(rebuilt?.showInactive).toHaveBeenCalledOnce()
+
+    service.dispose()
+  })
+
+  it('rebuilds the popup when the renderer never answers', async () => {
+    vi.useFakeTimers()
+    try {
+      const service = new TrayService(
+        createWindow(),
+        { showTrayIcon: true, minimizeToTrayOnClose: true },
+        createLogger(),
+      )
+      const tray = electronMocks.instances[0]
+      const tooltip = electronMocks.tooltipWindows[0]
+      service.setTooltip([sampleCard], 100)
+
+      tooltip?.executeJavaScript.mockReturnValue(new Promise<never>(() => {}))
+      tray?.handlers.get('mouse-enter')?.()
+      await vi.advanceTimersByTimeAsync(4_000)
+      expect(tooltip?.showInactive).not.toHaveBeenCalled()
+      expect(tooltip?.destroy).toHaveBeenCalledOnce()
+
+      tray?.handlers.get('mouse-enter')?.()
+      await vi.advanceTimersByTimeAsync(100)
+      const rebuilt = electronMocks.tooltipWindows[1]
+      expect(rebuilt).toBeDefined()
+      expect(rebuilt?.showInactive).toHaveBeenCalledOnce()
+
+      service.dispose()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('rejects withTimeout when the source promise never settles', async () => {
+    vi.useFakeTimers()
+    try {
+      const pending = withTimeout(new Promise<never>(() => {}), 1_000)
+      let error: unknown = null
+      pending.catch((reason: unknown) => {
+        error = reason
+      })
+      await vi.advanceTimersByTimeAsync(1_001)
+      expect(error).toBeInstanceOf(Error)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })

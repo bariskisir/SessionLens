@@ -23,6 +23,7 @@ import ClaudeAuthReader from './services/usage/ClaudeAuthReader'
 import AntigravityAuthReader from './services/usage/AntigravityAuthReader'
 import { ALL_PROVIDERS } from './providers/registry'
 import { probeConfiguredProviderIds } from './providers/CredentialProbe'
+import { repairToastActivatorLaunchPaths } from './services/ToastActivatorRepair'
 import type { NotificationLevel } from '@shared/types'
 import { IpcChannel } from '@shared/IpcChannel'
 
@@ -46,11 +47,26 @@ const hasSingleInstanceLock = app.requestSingleInstanceLock()
 let loggerService: LoggerService | null = null
 let trayService: TrayService | null = null
 let refreshService: UsageRefreshService | null = null
+/** Toasts shown without the tray service, kept for dismissal on quit. */
+const fallbackNotifications = new Set<Notification>()
+
+const dismissToast = (notification: Notification): void => {
+  try {
+    // On Windows, close() also removes the toast from the Action Center.
+    notification.close()
+  } catch (error) {
+    loggerService?.warn('Application', 'Notification could not be dismissed.', error)
+  }
+}
 
 const emitNativeNotification = (level: NotificationLevel, message: string): void => {
   try {
     if (trayService?.showNotification(level, message)) return
     const notification = new Notification({ body: message, silent: false })
+    // Same read-only contract as the tray path: clicking only dismisses the
+    // toast, never opening a window or launching a fresh app instance.
+    notification.on('click', () => dismissToast(notification))
+    fallbackNotifications.add(notification)
     notification.show()
   } catch (error) {
     loggerService?.error('Application', 'Native notification could not be shown.', error)
@@ -65,6 +81,20 @@ const openApplicationWindow = async (startHidden = false): Promise<void> => {
 
   const logger = new LoggerService(applicationPaths.logsRoot, settings.logLevel)
   loggerService = logger
+
+  // Force the Windows toast activator to register now instead of after the first
+  // notification: otherwise a toast clicked before any notification was shown in
+  // this session fails the in-process COM lookup and Windows launches the bare
+  // registered executable — which in dev opens Electron's default screen.
+  if (process.platform === 'win32') {
+    logger.info('Application', 'Native toast support checked.', {
+      supported: Notification.isSupported(),
+    })
+    // In development the activator's launch command points at the bare
+    // electron.exe; repoint it at this app so a cold toast click (app closed)
+    // starts Session Lens hidden instead of Electron's default screen.
+    if (!app.isPackaged) void repairToastActivatorLaunchPaths(logger)
+  }
   void telemetryService
     .trackStartup({
       appName: 'SessionLens',
@@ -189,6 +219,12 @@ if (!hasSingleInstanceLock) {
 
 app.on('before-quit', () => {
   trayService?.prepareToQuit()
+  // Clear fallback toasts from the Action Center so stale entries cannot
+  // relaunch a bare executable (dev) or a second app instance.
+  for (const notification of fallbackNotifications) {
+    dismissToast(notification)
+  }
+  fallbackNotifications.clear()
 })
 
 app.on('window-all-closed', () => {

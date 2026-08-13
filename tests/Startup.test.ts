@@ -40,4 +40,10 @@ describe('startup', () => {
     expect(isHiddenStartupLaunch(['SessionLens.exe', START_HIDDEN_ARGUMENT])).toBe(true)
     expect(isHiddenStartupLaunch(['SessionLens.exe', '--hidden-window'])).toBe(false)
   })
+
+  it('treats Windows COM activation launches as hidden', () => {
+    expect(isHiddenStartupLaunch(['SessionLens.exe', '-Embedding'])).toBe(true)
+    expect(isHiddenStartupLaunch(['SessionLens.exe', '/Embedding'])).toBe(true)
+    expect(isHiddenStartupLaunch(['SessionLens.exe'])).toBe(false)
+  })
 })

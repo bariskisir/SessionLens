@@ -6,6 +6,9 @@ import type { App } from 'electron'
 
 export const START_HIDDEN_ARGUMENT = '--hidden'
 
+/** Windows COM local-server activation argument used when a toast launches the app. */
+const EMBEDDING_ARGUMENTS = ['-Embedding', '/Embedding']
+
 type LoginItemRegistrar = Pick<App, 'isPackaged' | 'setLoginItemSettings'>
 type LoginItemSettings = Parameters<App['setLoginItemSettings']>[0]
 
@@ -23,6 +26,9 @@ export const configureStartOnLogin = (
   registrar.setLoginItemSettings(settings)
 }
 
-/** Detects the explicit argument used only by the operating-system startup registration. */
+/**
+ * Detects launches that must not open the main window: the operating-system startup
+ * registration and Windows COM activation (a toast click launching the local server).
+ */
 export const isHiddenStartupLaunch = (argv: readonly string[]): boolean =>
-  argv.includes(START_HIDDEN_ARGUMENT)
+  argv.includes(START_HIDDEN_ARGUMENT) || EMBEDDING_ARGUMENTS.some((arg) => argv.includes(arg))
