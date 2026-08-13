@@ -50,6 +50,7 @@ const electronMocks = vi.hoisted(() => {
     public readonly setBounds = vi.fn()
     public readonly setAlwaysOnTop = vi.fn()
     public readonly setIgnoreMouseEvents = vi.fn()
+    public readonly moveTop = vi.fn()
   }
 
   return {

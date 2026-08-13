@@ -177,7 +177,13 @@ export default class TrayService {
   private onTrayEnter(): void {
     // A missed mouse-leave must not disable the popup permanently: skip only
     // while it is already open, and attempt the show for every other enter.
-    if (this.tooltip?.isVisible()) return
+    if (this.tooltip && !this.tooltip.isDestroyed() && this.tooltip.isVisible()) {
+      // The popup can still sink below other windows while visible; re-raise it.
+      this.tooltip.setAlwaysOnTop(false)
+      this.tooltip.setAlwaysOnTop(true, 'pop-up-menu')
+      this.tooltip.moveTop()
+      return
+    }
     this.hovering = true
     void this.showTooltip()
   }
@@ -313,6 +319,14 @@ export default class TrayService {
     )
     tooltip.setBounds({ x, y, width, height })
     tooltip.showInactive()
+    // Windows keeps the topmost style across hide/show cycles, but a
+    // focusable:false window raised with showInactive() can still drop
+    // behind other windows on later shows. Toggling the flag forces Electron
+    // to re-apply the topmost z-order, and moveTop() raises the popup without
+    // activating it.
+    tooltip.setAlwaysOnTop(false)
+    tooltip.setAlwaysOnTop(true, 'pop-up-menu')
+    tooltip.moveTop()
   }
 
   private showWindow(): void {
