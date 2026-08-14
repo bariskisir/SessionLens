@@ -33,7 +33,11 @@ export default class WindowService {
   }
 
   /** Creates and loads a hardened desktop window. */
-  public async createWindow(logger: LoggerService, showOnReady = true): Promise<BrowserWindow> {
+  public async createWindow(
+    logger: LoggerService,
+    showOnReady = true,
+    startMinimized = false,
+  ): Promise<BrowserWindow> {
     this.logger = logger
     const storedState = await this.loadWindowState()
     const restoredBounds = storedState
@@ -78,7 +82,7 @@ export default class WindowService {
     window.once('ready-to-show', () => {
       if (storedState?.fullScreen) window.setFullScreen(true)
       else if (storedState?.maximized) window.maximize()
-      if (showOnReady) window.show()
+      if (showOnReady && !startMinimized) window.show()
     })
     window.once('closed', () => {
       if (this.stateSaveTimer) clearTimeout(this.stateSaveTimer)

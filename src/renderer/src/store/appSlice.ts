@@ -13,6 +13,7 @@ import {
 export type SettingsSection =
   | 'general'
   | 'display'
+  | 'tray'
   | 'tooltip'
   | 'icon'
   | 'defaultModels'

@@ -23,6 +23,7 @@ const fr = {
     title: 'Paramètres',
     general: 'Général',
     display: 'Affichage',
+    tray: 'Zone de notification',
     tooltip: 'Infobulle',
     icon: 'Icône',
     defaultModels: 'Modèles par défaut',
@@ -67,6 +68,9 @@ const fr = {
     minimizeToTrayOnClose: 'Réduire dans la zone de notification à la fermeture',
     minimizeToTrayOnCloseDescription:
       "Masquez la fenêtre dans la zone de notification au lieu de quitter l'application.",
+    startMinimized: 'Démarrer réduit',
+    startMinimizedDescription:
+      "Démarrez l'application cachée dans la zone de notification au lieu d'afficher sa fenêtre.",
     trayUnavailable: 'L’intégration à la zone de notification n’est pas disponible sous Linux.',
     alwaysOnTop: 'Toujours au premier plan',
     checkUpdatesOnStartup: 'Rechercher les mises à jour au démarrage',

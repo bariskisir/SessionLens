@@ -23,6 +23,7 @@ const ja = {
     title: '設定',
     general: '一般',
     display: '表示',
+    tray: 'トレイ',
     tooltip: 'ツールチップ',
     icon: 'アイコン',
     defaultModels: 'デフォルトモデル',
@@ -67,6 +68,9 @@ const ja = {
     minimizeToTrayOnClose: '閉じるときにトレイへ最小化',
     minimizeToTrayOnCloseDescription:
       'ウィンドウを閉じたとき、終了せずにシステムトレイへ隠します。',
+    startMinimized: '最小化して起動',
+    startMinimizedDescription:
+      'ウィンドウを表示せず、システムトレイで隠れた状態でアプリケーションを起動します。',
     trayUnavailable: 'Linux ではシステムトレイ連携を利用できません。',
     alwaysOnTop: '常に最前面に表示',
     checkUpdatesOnStartup: '起動時にアップデートを確認',

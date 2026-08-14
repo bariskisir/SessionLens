@@ -110,7 +110,7 @@ const openApplicationWindow = async (startHidden = false): Promise<void> => {
   const updater = new AppUpdater(logger)
   updater.applySettings(settings)
 
-  const window = await windowService.createWindow(logger, !startHidden)
+  const window = await windowService.createWindow(logger, !startHidden, settings.startMinimized)
 
   trayService?.dispose()
   const tray = new TrayService(

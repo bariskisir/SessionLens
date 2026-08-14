@@ -25,6 +25,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   alwaysOnTop: false,
   showTrayIcon: true,
   minimizeToTrayOnClose: true,
+  startMinimized: true,
   autoUpdate: true,
   telemetryEnabled: true,
   unattendedUpdates: true,

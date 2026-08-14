@@ -134,6 +134,7 @@ export interface AppSettings {
   alwaysOnTop: boolean
   showTrayIcon: boolean
   minimizeToTrayOnClose: boolean
+  startMinimized: boolean
   autoUpdate: boolean
   telemetryEnabled: boolean
   unattendedUpdates: boolean

@@ -84,6 +84,7 @@ export const registerIpc = (window: BrowserWindow, services: IpcServices): void 
     if (process.platform === 'linux') {
       settings.showTrayIcon = false
       settings.minimizeToTrayOnClose = false
+      settings.startMinimized = false
     }
     window.webContents.setZoomFactor(settings.pageZoom)
 
@@ -108,6 +109,7 @@ export const registerIpc = (window: BrowserWindow, services: IpcServices): void 
     if (process.platform === 'linux') {
       delete patch.showTrayIcon
       delete patch.minimizeToTrayOnClose
+      delete patch.startMinimized
     }
     if (process.platform === 'win32' && patch.startOnStartup === true) {
       patch.showTrayIcon = true

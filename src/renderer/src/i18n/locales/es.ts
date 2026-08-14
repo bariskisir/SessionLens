@@ -23,6 +23,7 @@ const es = {
     title: 'Ajustes',
     general: 'General',
     display: 'Apariencia',
+    tray: 'Área de notificación',
     tooltip: 'Información',
     icon: 'Icono',
     defaultModels: 'Modelos predeterminados',
@@ -67,6 +68,9 @@ const es = {
     minimizeToTrayOnClose: 'Minimizar a la bandeja al cerrar',
     minimizeToTrayOnCloseDescription:
       'Oculta la ventana en la bandeja del sistema en lugar de salir al cerrarla.',
+    startMinimized: 'Iniciar minimizado',
+    startMinimizedDescription:
+      'Inicia la aplicación oculta en el área de notificación en lugar de mostrar su ventana.',
     trayUnavailable: 'La integración con la bandeja del sistema no está disponible en Linux.',
     alwaysOnTop: 'Siempre visible',
     checkUpdatesOnStartup: 'Buscar actualizaciones al iniciar',

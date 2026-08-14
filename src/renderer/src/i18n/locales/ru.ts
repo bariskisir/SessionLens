@@ -23,6 +23,7 @@ const ru = {
     title: 'Настройки',
     general: 'Общие',
     display: 'Отображение',
+    tray: 'Область уведомлений',
     tooltip: 'Подсказка',
     icon: 'Значок',
     defaultModels: 'Модели по умолчанию',
@@ -67,6 +68,9 @@ const ru = {
     minimizeToTrayOnClose: 'Сворачивать в трей при закрытии',
     minimizeToTrayOnCloseDescription:
       'Скрывать окно в системном трее вместо выхода из приложения при закрытии.',
+    startMinimized: 'Запускать свёрнутым',
+    startMinimizedDescription:
+      'Запускает приложение скрытым в области уведомлений, не показывая его окно.',
     trayUnavailable: 'Интеграция с системным треем недоступна в Linux.',
     alwaysOnTop: 'Поверх всех окон',
     checkUpdatesOnStartup: 'Проверять обновления при запуске',

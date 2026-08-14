@@ -108,14 +108,14 @@ SessionLens/
 |           |-- i18n/locales/            # en, tr, de, fr, pt, zh, es, ru, ja, ko
 |           |-- pages/
 |           |   `-- settings/            # Settings page; sections/ holds one section per feature
-|           |       |-- sections/        # General, Display, Icon, Tooltip, Providers, Default models,
+|           |       |-- sections/        # General, Display, Tray, Icon, Tooltip, Providers, Default models,
 |           |       |                    # Notifications, Updates, Logging, About
 |           |       `-- components/
 |           |-- services/                # Renderer logger bridge, SettingsPersistenceQueue
 |           |-- store/                   # Single Redux app slice
 |           |-- utils/                   # Formatting helpers
 |           `-- assets/styles/           # Shared SCSS variables and resets
-|-- tests/                               # 15 Vitest files / 105 tests at time of writing
+|-- tests/                               # 18 Vitest files / 129 tests at time of writing
 |-- build/                               # Product and notification icons used by the installer
 |-- vite.config.mts
 |-- vitest.config.mts
@@ -306,6 +306,9 @@ In development the activator's `LocalServer32` launch command is repaired at sta
 - Start-on-login is skipped on Linux in the IPC layer.
 - `Minimize to tray on close` defaults to enabled; closing the window hides it only when the tray
   was created successfully.
+- Tray settings default to enabled (`showTrayIcon`, `minimizeToTrayOnClose`, `startMinimized`). The
+  start-minimized preference hides the window to the tray on launch whenever the tray icon is
+  enabled.
 - The tray icon shows per-provider quota bars and rebuilds them on every snapshot.
 - The hover tooltip is a pre-created, non-focusable, transparent popup (`showInactive`, mouse
   events ignored) that is hidden on hover-out and destroyed only on dispose. Its renderer keeps

@@ -23,6 +23,7 @@ const tr = {
     title: 'Ayarlar',
     general: 'Genel',
     display: 'Görünüm',
+    tray: 'Sistem Tepsisi',
     tooltip: 'İpucu',
     icon: 'Simge',
     defaultModels: 'Varsayılan modeller',
@@ -66,6 +67,9 @@ const tr = {
     showTrayIconDescription: 'Session Lens uygulamasını sistem tepsisinde göster.',
     minimizeToTrayOnClose: 'Kapatırken tepsiye küçült',
     minimizeToTrayOnCloseDescription: 'Pencere kapandığında uygulamayı çalışır durumda tut.',
+    startMinimized: 'Küçültülmüş başlat',
+    startMinimizedDescription:
+      'Uygulamayı pencereyi göstermek yerine sistem tepsisinde gizli olarak başlatın.',
     trayUnavailable: 'Sistem tepsisi bütünleştirmesi Linux üzerinde kullanılamıyor.',
     alwaysOnTop: 'Her zaman üstte',
     checkUpdatesOnStartup: 'Başlangıçta güncellemeleri denetle',

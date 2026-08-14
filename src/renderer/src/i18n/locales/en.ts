@@ -23,6 +23,7 @@ const en = {
     title: 'Settings',
     general: 'General',
     display: 'Display',
+    tray: 'Tray',
     tooltip: 'Tooltip',
     icon: 'Icon',
     defaultModels: 'Default models',
@@ -67,6 +68,9 @@ const en = {
     showTrayIconDescription: 'Show Session Lens in the system tray.',
     minimizeToTrayOnClose: 'Minimize to tray on close',
     minimizeToTrayOnCloseDescription: 'Keep the application running when the window closes.',
+    startMinimized: 'Start minimized',
+    startMinimizedDescription:
+      'Start the application hidden in the system tray instead of showing its window.',
     trayUnavailable: 'System tray integration is unavailable on Linux.',
     alwaysOnTop: 'Always on top',
     checkUpdatesOnStartup: 'Check for updates on startup',

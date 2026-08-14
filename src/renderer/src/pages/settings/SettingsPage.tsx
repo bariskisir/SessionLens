@@ -7,6 +7,7 @@ import {
   Activity,
   Bell,
   Bot,
+  Inbox,
   Info,
   MessageSquare,
   Monitor,
@@ -29,6 +30,7 @@ import LoggingSettingsSection from './sections/LoggingSettingsSection'
 import NotificationsSettingsSection from './sections/NotificationsSettingsSection'
 import ProvidersSettingsSection from './sections/ProvidersSettingsSection'
 import TelemetrySettingsSection from './sections/TelemetrySettingsSection'
+import TraySettingsSection from './sections/TraySettingsSection'
 import UpdatesSettingsSection from './sections/UpdatesSettingsSection'
 import styles from './SettingsPage.module.scss'
 
@@ -48,6 +50,7 @@ const SettingsPage = (): React.JSX.Element => {
   }> = [
     { key: 'general', label: t('settings.general'), icon: <Settings2 size={17} /> },
     { key: 'display', label: t('settings.display'), icon: <Monitor size={17} /> },
+    { key: 'tray', label: t('settings.tray'), icon: <Inbox size={17} /> },
     { key: 'providers', label: t('settings.providers'), icon: <Server size={17} /> },
     { key: 'notifications', label: t('settings.notifications'), icon: <Bell size={17} /> },
     { key: 'tooltip', label: t('settings.tooltip'), icon: <MessageSquare size={17} /> },
@@ -62,6 +65,7 @@ const SettingsPage = (): React.JSX.Element => {
   const sectionComponents: Record<SettingsSection, React.ComponentType> = {
     general: GeneralSettingsSection,
     display: DisplaySettingsSection,
+    tray: TraySettingsSection,
     providers: ProvidersSettingsSection,
     notifications: NotificationsSettingsSection,
     tooltip: TooltipSettingsSection,
