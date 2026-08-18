@@ -288,6 +288,20 @@ describe('TrayService', () => {
     expect(window.webContents.send).toHaveBeenCalledWith('event:settings-open-requested')
   })
 
+  it('never sets a native tray tooltip', () => {
+    const service = new TrayService(
+      createWindow(),
+      { showTrayIcon: true, minimizeToTrayOnClose: true },
+      createLogger(),
+    )
+
+    // Setting one -- even to an empty string -- makes Windows draw an empty
+    // tooltip box over the tray icon, on top of the custom popup.
+    expect(electronMocks.instances[0]?.setToolTip).not.toHaveBeenCalled()
+
+    service.dispose()
+  })
+
   it('pre-creates the popup, shows it on hover and hides it on leave', async () => {
     const service = new TrayService(
       createWindow(),

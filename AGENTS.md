@@ -9,7 +9,7 @@ detects threshold crossings, and delivers notifications natively and through Tel
 webhooks. When a provider's reset deadline advances, it optionally starts a minimal session so
 the new quota is consumed immediately.
 
-The product version is `1.0.0`. The internal TypeScript model and persistence use the
+The product version is `1.2.2`. The internal TypeScript model and persistence use the
 `settings`/`provider` naming, while the UI groups provider configuration under the **Providers**
 settings section.
 
@@ -316,8 +316,9 @@ In development the activator's `LocalServer32` launch command is repaired at sta
   hide/show cycles.
 - The popup stays closed and the tray glyph stays default while no usage data has been collected
   yet (offline or before the first refresh); hovering does nothing until the first card exists.
-  A hung or dead popup renderer is discarded and rebuilt on the next hover, and the
-  Windows-native tray hover tooltip is suppressed so it cannot overlap the custom popup.
+  A hung or dead popup renderer is discarded and rebuilt on the next hover. No native tray
+  tooltip is ever set: on Windows `setToolTip` enables the native hover tooltip, and an empty
+  string still draws an empty rounded box over the tray icon, so the call is omitted entirely.
 - Windows window animations are disabled via the `wm-window-animations-disabled` switch.
 - The window is frameless (Windows/Linux) with a custom titlebar; macOS uses a hidden title bar
   with overlay controls.

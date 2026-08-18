@@ -162,9 +162,9 @@ export default class TrayService {
       tray.on('click', () => this.showWindow())
       tray.on('mouse-enter', () => this.onTrayEnter())
       tray.on('mouse-leave', () => this.onTrayLeave())
-      // Windows also shows a native hover tooltip for tray icons; suppress it
-      // so it can never overlap the custom popup.
-      if (process.platform === 'win32') tray.setToolTip('')
+      // No tooltip is ever set: on Windows `setToolTip` turns the native hover
+      // tooltip on (an empty string still draws an empty rounded box over the
+      // tray icon), while leaving it unset keeps the custom popup alone.
       this.tray = tray
       // Pre-create the popup so the first hover is as instant as later ones.
       void this.ensureTooltipWindow()
