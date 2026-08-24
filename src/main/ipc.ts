@@ -81,11 +81,6 @@ export const registerIpc = (window: BrowserWindow, services: IpcServices): void 
   ipcMain.handle(IpcChannel.AppBootstrap, async (event) => {
     assertSender(event.sender)
     const settings = await services.storage.loadSettings()
-    if (process.platform === 'linux') {
-      settings.showTrayIcon = false
-      settings.minimizeToTrayOnClose = false
-      settings.startMinimized = false
-    }
     window.webContents.setZoomFactor(settings.pageZoom)
 
     return {
@@ -106,11 +101,6 @@ export const registerIpc = (window: BrowserWindow, services: IpcServices): void 
   ipcMain.handle(IpcChannel.SettingsSave, async (event, input: unknown) => {
     assertSender(event.sender)
     const patch = settingsPatchSchema.parse(input)
-    if (process.platform === 'linux') {
-      delete patch.showTrayIcon
-      delete patch.minimizeToTrayOnClose
-      delete patch.startMinimized
-    }
     if (process.platform === 'win32' && patch.startOnStartup === true) {
       patch.showTrayIcon = true
     }

@@ -71,7 +71,6 @@ const es = {
     startMinimized: 'Iniciar minimizado',
     startMinimizedDescription:
       'Inicia la aplicación oculta en el área de notificación en lugar de mostrar su ventana.',
-    trayUnavailable: 'La integración con la bandeja del sistema no está disponible en Linux.',
     alwaysOnTop: 'Siempre visible',
     checkUpdatesOnStartup: 'Buscar actualizaciones al iniciar',
     checkUpdatesOnStartupDescription:

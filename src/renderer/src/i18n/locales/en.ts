@@ -71,7 +71,6 @@ const en = {
     startMinimized: 'Start minimized',
     startMinimizedDescription:
       'Start the application hidden in the system tray instead of showing its window.',
-    trayUnavailable: 'System tray integration is unavailable on Linux.',
     alwaysOnTop: 'Always on top',
     checkUpdatesOnStartup: 'Check for updates on startup',
     checkUpdatesOnStartupDescription:

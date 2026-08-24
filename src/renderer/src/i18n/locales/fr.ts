@@ -71,7 +71,6 @@ const fr = {
     startMinimized: 'Démarrer réduit',
     startMinimizedDescription:
       "Démarrez l'application cachée dans la zone de notification au lieu d'afficher sa fenêtre.",
-    trayUnavailable: 'L’intégration à la zone de notification n’est pas disponible sous Linux.',
     alwaysOnTop: 'Toujours au premier plan',
     checkUpdatesOnStartup: 'Rechercher les mises à jour au démarrage',
     checkUpdatesOnStartupDescription:

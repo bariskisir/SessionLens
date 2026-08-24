@@ -98,6 +98,11 @@ vi.mock('electron', () => ({
   },
   screen: {
     getDisplayNearestPoint: vi.fn(() => ({ workArea: { x: 0, y: 0, width: 1920, height: 1080 } })),
+    getCursorScreenPoint: vi.fn(() => ({ x: 960, y: 50 })),
+    getPrimaryDisplay: vi.fn(() => ({
+      workArea: { x: 0, y: 0, width: 1920, height: 1080 },
+      bounds: { x: 0, y: 0, width: 1920, height: 1080 },
+    })),
   },
   Tray: class extends electronMocks.MockTray {
     public constructor() {
@@ -178,6 +183,7 @@ describe('TrayService', () => {
       window,
       { showTrayIcon: false, minimizeToTrayOnClose: false },
       createLogger(),
+      'win32',
     )
 
     service.applySettings({ showTrayIcon: true, minimizeToTrayOnClose: true })
@@ -192,6 +198,28 @@ describe('TrayService', () => {
     service.applySettings({ showTrayIcon: false, minimizeToTrayOnClose: false })
     expect(tray?.destroy).toHaveBeenCalledOnce()
     expect(service.shouldMinimizeOnClose()).toBe(false)
+  })
+
+  it('toggles the usage popup on tray activation when running on Linux', async () => {
+    const service = new TrayService(
+      createWindow(),
+      { showTrayIcon: true, minimizeToTrayOnClose: true },
+      createLogger(),
+      'linux',
+    )
+    const tray = electronMocks.instances[0]
+    const tooltip = electronMocks.tooltipWindows[0]
+    service.setTooltip([sampleCard], 100)
+
+    tray?.handlers.get('click')?.()
+    await flushAsync()
+    expect(tooltip?.showInactive).toHaveBeenCalledOnce()
+    expect(tooltip?.setBounds).toHaveBeenCalledWith({ x: 1632, y: 952, width: 280, height: 120 })
+
+    tray?.handlers.get('click')?.()
+    expect(tooltip?.hide).toHaveBeenCalledOnce()
+
+    service.dispose()
   })
 
   it('never hides the window when native tray creation fails', () => {

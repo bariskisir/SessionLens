@@ -285,7 +285,6 @@ describe('locale key consistency', () => {
       'settings.pageZoomDescription',
       'settings.showTrayIconDescription',
       'settings.minimizeToTrayOnCloseDescription',
-      'settings.trayUnavailable',
       'settings.checkUpdatesOnStartupDescription',
       'settings.unattendedUpdates',
       'settings.unattendedUpdatesDescription',

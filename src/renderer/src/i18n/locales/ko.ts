@@ -70,7 +70,6 @@ const ko = {
     startMinimized: '최소화로 시작',
     startMinimizedDescription:
       '창을 표시하지 않고 시스템 트레이에서 숨긴 상태로 애플리케이션을 시작합니다.',
-    trayUnavailable: 'Linux에서는 시스템 트레이 연동을 사용할 수 없습니다.',
     alwaysOnTop: '항상 위에 표시',
     checkUpdatesOnStartup: '시작 시 업데이트 확인',
     checkUpdatesOnStartupDescription:

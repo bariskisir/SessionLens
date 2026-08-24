@@ -9,7 +9,7 @@ detects threshold crossings, and delivers notifications natively and through Tel
 webhooks. When a provider's reset deadline advances, it optionally starts a minimal session so
 the new quota is consumed immediately.
 
-The product version is `1.2.2`. The internal TypeScript model and persistence use the
+The product version is `1.3.0`. The internal TypeScript model and persistence use the
 `settings`/`provider` naming, while the UI groups provider configuration under the **Providers**
 settings section.
 
@@ -309,6 +309,17 @@ In development the activator's `LocalServer32` launch command is repaired at sta
 - Tray settings default to enabled (`showTrayIcon`, `minimizeToTrayOnClose`, `startMinimized`). The
   start-minimized preference hides the window to the tray on launch whenever the tray icon is
   enabled.
+- Linux tray specifics: Electron is pinned to `43.2.0` because 43.3.0+ (Chromium 150 SNI
+  multiplexer) cannot serve property reads addressed by the unique bus name, which breaks the GNOME
+  AppIndicator extension (three-dot fallback; electron/electron#52674). The GNOME extension file
+  `/usr/share/gnome-shell/extensions/appindicatorsupport@rgcjonas.gmail.com/indicatorStatusIcon.js`
+  is patched so a primary click on Session Lens calls `Activate` instead of opening the DBusMenu
+  (same patch as UsageBar). On Linux the tray `click` event toggles the usage popup instead of
+  showing the window; right-click keeps the DBusMenu. The popup is always sized against and
+  aligned to the bottom-right corner of the display work area, so scale changes expand it inward
+  without moving it off-screen. Linux launches must run through XWayland (`--ozone-platform=x11`,
+  passed by the vite dev startup and required for packaged launches): Wayland compositors place
+  windows themselves and expose no pointer position, which would center the tooltip.
 - The tray icon shows per-provider quota bars and rebuilds them on every snapshot.
 - The hover tooltip is a pre-created, non-focusable, transparent popup (`showInactive`, mouse
   events ignored) that is hidden on hover-out and destroyed only on dispose. Its renderer keeps

@@ -59,6 +59,7 @@ export default class TrayService {
     private readonly window: BrowserWindow,
     settings: TraySettings,
     private readonly logger: LoggerService,
+    private readonly platform: NodeJS.Platform = process.platform,
   ) {
     this.settings = { ...settings }
     this.updateTrayIcon()
@@ -159,7 +160,12 @@ export default class TrayService {
           { label: 'Exit', role: 'quit' },
         ]),
       )
-      tray.on('click', () => this.showWindow())
+      tray.on('click', () => {
+        // Linux SNI has no hover events, so the primary activation (single
+        // click, sent by the AppIndicator host) toggles the usage popup.
+        if (this.platform === 'linux') this.toggleTooltipOnLinuxClick()
+        else this.showWindow()
+      })
       tray.on('mouse-enter', () => this.onTrayEnter())
       tray.on('mouse-leave', () => this.onTrayLeave())
       // No tooltip is ever set: on Windows `setToolTip` turns the native hover
@@ -191,6 +197,17 @@ export default class TrayService {
   private onTrayLeave(): void {
     this.hovering = false
     if (this.tooltip && !this.tooltip.isDestroyed()) this.tooltip.hide()
+  }
+
+  /** Toggles the usage popup on Linux primary activation (click). */
+  private toggleTooltipOnLinuxClick(): void {
+    if (this.tooltip && !this.tooltip.isDestroyed() && this.tooltip.isVisible()) {
+      this.tooltip.hide()
+      this.hovering = false
+      return
+    }
+    this.hovering = true
+    void this.showTooltip()
   }
 
   /** Returns the pre-created popup, creating and loading it once on first use. */
@@ -237,7 +254,8 @@ export default class TrayService {
     if (this.tooltip !== tooltip || tooltip.isDestroyed() || tooltip.isVisible()) return
     if (this.quitting || !this.hovering) return
     try {
-      this.placeAndShow(tooltip, size)
+      if (this.platform === 'linux') this.placeAndShowOnLinux(tooltip, size)
+      else this.placeAndShow(tooltip, size)
     } catch (error) {
       this.logger.warn('TrayService', 'Tray tooltip popup could not be shown.', error)
       this.invalidateTooltipWindow(tooltip)
@@ -324,6 +342,27 @@ export default class TrayService {
     // behind other windows on later shows. Toggling the flag forces Electron
     // to re-apply the topmost z-order, and moveTop() raises the popup without
     // activating it.
+    tooltip.setAlwaysOnTop(false)
+    tooltip.setAlwaysOnTop(true, 'pop-up-menu')
+    tooltip.moveTop()
+  }
+
+  /**
+   * Places the popup at the bottom-right of the display work area. Aligning
+   * against the measured size keeps the popup fully visible at every scale.
+   */
+  private placeAndShowOnLinux(
+    tooltip: BrowserWindow,
+    size: { width: number; height: number },
+  ): void {
+    const display = screen.getPrimaryDisplay()
+    const work = display.workArea
+    const width = Math.max(TOOLTIP_MARGIN, Math.min(size.width, work.width - TOOLTIP_MARGIN * 2))
+    const height = Math.max(TOOLTIP_MARGIN, Math.min(size.height, work.height - TOOLTIP_MARGIN * 2))
+    const left = work.x + work.width - width - TOOLTIP_MARGIN
+    const top = work.y + work.height - height - TOOLTIP_MARGIN
+    tooltip.setBounds({ x: left, y: top, width, height })
+    tooltip.showInactive()
     tooltip.setAlwaysOnTop(false)
     tooltip.setAlwaysOnTop(true, 'pop-up-menu')
     tooltip.moveTop()

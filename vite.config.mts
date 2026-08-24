@@ -19,7 +19,11 @@ const startElectron = async ({
     options?: import('node:child_process').SpawnOptions,
   ) => Promise<boolean>
 }): Promise<void> => {
-  await startup(['.'], { cwd: repositoryRoot })
+  // Run through XWayland on Linux: Wayland compositors place windows themselves,
+  // which would center the tray tooltip instead of opening it next to the icon.
+  await startup(process.platform === 'linux' ? ['.', '--ozone-platform=x11'] : ['.'], {
+    cwd: repositoryRoot,
+  })
 }
 
 export default defineConfig({

@@ -2,7 +2,7 @@
  * Renders system tray and startup visibility preferences.
  */
 
-import { Switch, Tooltip } from 'antd'
+import { Switch } from 'antd'
 import { useTranslation } from 'react-i18next'
 import { useSettingsActions } from '@renderer/hooks/useSettingsActions'
 import { useAppSelector } from '@renderer/store'
@@ -12,7 +12,6 @@ import styles from '../SettingsPage.module.scss'
 /** Displays tray icon and startup minimization controls. */
 const TraySettingsSection = (): React.JSX.Element => {
   const settings = useAppSelector((state) => state.app.settings)
-  const platform = useAppSelector((state) => state.app.platform)
   const settingsActions = useSettingsActions()
   const { t } = useTranslation()
 
@@ -50,13 +49,7 @@ const TraySettingsSection = (): React.JSX.Element => {
             description={t('settings.showTrayIconDescription')}
           />
           <div className={styles.settingControl}>
-            <Tooltip title={platform === 'linux' ? t('settings.trayUnavailable') : undefined}>
-              <Switch
-                checked={settings.showTrayIcon}
-                disabled={platform === 'linux'}
-                onChange={changeTrayIcon}
-              />
-            </Tooltip>
+            <Switch checked={settings.showTrayIcon} onChange={changeTrayIcon} />
           </div>
         </div>
         <div className={styles.settingRow}>
@@ -65,13 +58,7 @@ const TraySettingsSection = (): React.JSX.Element => {
             description={t('settings.minimizeToTrayOnCloseDescription')}
           />
           <div className={styles.settingControl}>
-            <Tooltip title={platform === 'linux' ? t('settings.trayUnavailable') : undefined}>
-              <Switch
-                checked={settings.minimizeToTrayOnClose}
-                disabled={platform === 'linux'}
-                onChange={changeMinimizeToTray}
-              />
-            </Tooltip>
+            <Switch checked={settings.minimizeToTrayOnClose} onChange={changeMinimizeToTray} />
           </div>
         </div>
         <div className={styles.settingRow}>
@@ -80,13 +67,7 @@ const TraySettingsSection = (): React.JSX.Element => {
             description={t('settings.startMinimizedDescription')}
           />
           <div className={styles.settingControl}>
-            <Tooltip title={platform === 'linux' ? t('settings.trayUnavailable') : undefined}>
-              <Switch
-                checked={settings.startMinimized}
-                disabled={platform === 'linux'}
-                onChange={changeStartMinimized}
-              />
-            </Tooltip>
+            <Switch checked={settings.startMinimized} onChange={changeStartMinimized} />
           </div>
         </div>
       </section>

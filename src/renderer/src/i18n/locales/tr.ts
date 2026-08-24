@@ -70,7 +70,6 @@ const tr = {
     startMinimized: 'Küçültülmüş başlat',
     startMinimizedDescription:
       'Uygulamayı pencereyi göstermek yerine sistem tepsisinde gizli olarak başlatın.',
-    trayUnavailable: 'Sistem tepsisi bütünleştirmesi Linux üzerinde kullanılamıyor.',
     alwaysOnTop: 'Her zaman üstte',
     checkUpdatesOnStartup: 'Başlangıçta güncellemeleri denetle',
     checkUpdatesOnStartupDescription:

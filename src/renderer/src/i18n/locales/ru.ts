@@ -71,7 +71,6 @@ const ru = {
     startMinimized: 'Запускать свёрнутым',
     startMinimizedDescription:
       'Запускает приложение скрытым в области уведомлений, не показывая его окно.',
-    trayUnavailable: 'Интеграция с системным треем недоступна в Linux.',
     alwaysOnTop: 'Поверх всех окон',
     checkUpdatesOnStartup: 'Проверять обновления при запуске',
     checkUpdatesOnStartupDescription:

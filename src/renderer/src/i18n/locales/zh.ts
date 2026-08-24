@@ -69,7 +69,6 @@ const zh = {
     minimizeToTrayOnCloseDescription: '关闭窗口时隐藏到系统托盘，而不是退出应用程序。',
     startMinimized: '最小化启动',
     startMinimizedDescription: '启动时隐藏到系统托盘，而不是显示窗口。',
-    trayUnavailable: 'Linux 上无法使用系统托盘集成。',
     alwaysOnTop: '窗口置顶',
     checkUpdatesOnStartup: '启动时检查更新',
     checkUpdatesOnStartupDescription: '应用启动时在 GitHub 上检查 Session Lens 的新版本。',

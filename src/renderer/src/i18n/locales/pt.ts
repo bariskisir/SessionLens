@@ -71,7 +71,6 @@ const pt = {
     startMinimized: 'Iniciar minimizado',
     startMinimizedDescription:
       'Inicie o aplicativo oculto na área de notificação em vez de mostrar a janela.',
-    trayUnavailable: 'A integração com a área de notificação não está disponível no Linux.',
     alwaysOnTop: 'Sempre visível',
     checkUpdatesOnStartup: 'Procurar atualizações ao iniciar',
     checkUpdatesOnStartupDescription:
