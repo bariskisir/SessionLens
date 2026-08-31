@@ -82,15 +82,37 @@ export default class WindowService {
     this.configureRendererDiagnostics(window, logger)
     this.configureSecurity(window)
     this.configureWindowStatePersistence(window)
+    const shouldShowOnReady = showOnReady && !startMinimized
     const revealWindow = (): void => {
       if (window.isDestroyed() || window.isVisible()) return
-      if (showOnReady && !startMinimized) window.show()
+      if (shouldShowOnReady) window.show()
     }
-    window.once('ready-to-show', () => {
+    const applyStoredDisplayMode = (): void => {
       if (storedState?.fullScreen) window.setFullScreen(true)
       else if (storedState?.maximized) window.maximize()
-      revealWindow()
-    })
+    }
+    if (shouldShowOnReady) {
+      window.once('ready-to-show', () => {
+        applyStoredDisplayMode()
+        revealWindow()
+      })
+    } else {
+      // When the launch is hidden (autostart --hidden or startMinimized), do not
+      // call maximize()/setFullScreen() while the window is still hidden — both
+      // APIs reveal the window on Windows (maximize docs: "This will also show
+      // the window if it isn't being displayed already"; setFullScreen also
+      // requires visibility). Defer the restoration until the user first shows
+      // the window via the tray so the boot stays hidden but the size is kept.
+      if (storedState?.fullScreen || storedState?.maximized) {
+        window.once('show', () => {
+          if (window.isDestroyed()) return
+          applyStoredDisplayMode()
+        })
+      }
+      window.once('ready-to-show', () => {
+        revealWindow()
+      })
+    }
     window.webContents.on('did-finish-load', () =>
       setTimeout(revealWindow, REVEAL_WINDOW_FALLBACK_MS),
     )
