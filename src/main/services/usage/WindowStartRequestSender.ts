@@ -8,7 +8,7 @@ import type LoggerService from '../LoggerService'
 import type CodexAuthReader from './CodexAuthReader'
 import type ClaudeAuthReader from './ClaudeAuthReader'
 import type AntigravityAuthReader from './AntigravityAuthReader'
-import { ProviderError, getJsonWithHeaders } from './ProviderHttp'
+import { ProviderError, getJsonWithHeaders, httpFetch } from './ProviderHttp'
 import { getString, getBoolean, getObject } from './ProviderJson'
 
 /** Endpoint for querying available Codex models. */
@@ -320,7 +320,7 @@ export default class WindowStartRequestSender {
   ): Promise<unknown> {
     const requestHeaders = { ...headers }
     requestHeaders['Content-Type'] = requestHeaders['Content-Type'] ?? 'application/json'
-    const response = await fetch(url, {
+    const response = await httpFetch(url, {
       method: 'POST',
       headers: requestHeaders,
       body: JSON.stringify(payload),
@@ -356,7 +356,7 @@ export default class WindowStartRequestSender {
     }
     const requestInit: RequestInit = { method, headers: requestHeaders }
     if (method === 'POST') requestInit.body = JSON.stringify(payload)
-    const response = await fetch(url, requestInit)
+    const response = await httpFetch(url, requestInit)
     if (!response.ok) {
       const body = await response.text()
       throw new ProviderError(

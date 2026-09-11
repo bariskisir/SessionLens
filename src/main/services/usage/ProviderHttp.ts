@@ -1,12 +1,67 @@
 /**
  * @file ProviderHttp.ts
  * @description Shared HTTP fetch helper routines for provider API requests, handling authentication headers and response parsing.
+ *
+ * Requests go through Electron's `net.fetch` (Chromium network stack) when running inside
+ * the Electron main process, falling back to Node fetch otherwise (for example under Vitest).
+ * The Chromium stack trusts the OS certificate store, so provider calls keep working behind
+ * TLS-intercepting antivirus software or corporate proxies whose root CA is installed
+ * system-wide but unknown to Node's bundled CA list.
  */
 
 import { getString } from './ProviderJson'
 
 /** Error thrown when a provider request fails or returns non-success status code. */
 export class ProviderError extends Error {}
+
+/** Fetch-compatible function signature shared by the Chromium and Node network stacks. */
+type FetchFunction = typeof fetch
+
+/**
+ * Memoized Electron `net.fetch`, or null when the Chromium network stack is unavailable.
+ * `undefined` means the implementation has not been resolved yet.
+ */
+let electronFetch: FetchFunction | null | undefined
+
+/**
+ * Loads Electron's `net.fetch` when running inside the Electron main process.
+ *
+ * @returns Electron fetch function, or null when unavailable
+ */
+const loadElectronFetch = async (): Promise<FetchFunction | null> => {
+  try {
+    const versions = (globalThis as { process?: { versions?: Record<string, string> } }).process
+      ?.versions
+    if (!versions || !('electron' in versions)) return null
+    const electron = (await import('electron')) as unknown as { net?: { fetch?: unknown } }
+    const candidate = electron.net?.fetch
+    if (typeof candidate !== 'function') return null
+    return (candidate as FetchFunction).bind(electron.net)
+  } catch {
+    return null
+  }
+}
+
+/**
+ * Sends an HTTP request through the Chromium network stack when available, falling back
+ * to Node fetch otherwise. The fallback reads `globalThis.fetch` lazily on every call so
+ * test doubles installed via `vi.stubGlobal('fetch', ...)` keep working.
+ *
+ * Shared by provider queries, warm-up window starts, update downloads, and telemetry so
+ * every outbound HTTPS call trusts the OS certificate store inside Electron.
+ *
+ * @param input - Request URL or Request object
+ * @param init - Optional fetch init options
+ * @returns Fetch Response promise
+ */
+export const httpFetch = async (
+  input: Parameters<FetchFunction>[0],
+  init?: Parameters<FetchFunction>[1],
+): Promise<Response> => {
+  if (electronFetch === undefined) electronFetch = await loadElectronFetch()
+  const implementation = electronFetch ?? globalThis.fetch
+  return implementation(input, init)
+}
 
 /**
  * Reads and truncates HTTP response text body up to 240 characters for error messages.
@@ -27,7 +82,7 @@ const readBody = async (response: Response): Promise<string> => {
  * @throws ProviderError if the HTTP request status is not ok
  */
 export const getJson = async (request: Request): Promise<unknown> => {
-  const response = await fetch(request)
+  const response = await httpFetch(request)
   if (!response.ok) {
     const body = await readBody(response)
     throw new ProviderError(
@@ -99,7 +154,7 @@ export const postJsonWithHeaders = async (
   body: unknown,
   headers: Record<string, string>,
 ): Promise<unknown> => {
-  const response = await fetch(url, {
+  const response = await httpFetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...headers },
     body: JSON.stringify(body),
@@ -122,7 +177,7 @@ export const postJsonWithHeaders = async (
  * @throws ProviderError if refresh request fails
  */
 export const postForm = async (url: string, body: URLSearchParams): Promise<unknown> => {
-  const response = await fetch(url, {
+  const response = await httpFetch(url, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -147,7 +202,7 @@ export const postForm = async (url: string, body: URLSearchParams): Promise<unkn
  * @returns Raw fetch Response object
  */
 export const postJson = async (url: string, payload: unknown): Promise<Response> => {
-  const response = await fetch(url, {
+  const response = await httpFetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload),

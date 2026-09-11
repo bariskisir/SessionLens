@@ -1,6 +1,6 @@
 {
   "name": "session-lens",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "Session Lens desktop application",
   "main": "./out/main/index.js",
   "author": "bariskisir",
