@@ -171,10 +171,11 @@ body {
   align-items: baseline;
   justify-content: flex-start;
   gap: 6px;
-  width: 100%;
   min-width: 0;
 }
 .card__name {
+  flex: 0 1 auto;
+  min-width: 0;
   overflow: hidden;
   color: var(--text-primary);
   font-size: 13px;
@@ -208,6 +209,12 @@ body {
   color: var(--text-secondary);
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+.card__notice {
+  flex: 0 0 auto;
+  max-width: none;
+  overflow: visible;
+  text-overflow: clip;
 }
 .card__provider-icon {
   flex: 0 0 auto;

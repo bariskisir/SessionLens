@@ -56,8 +56,23 @@ const getRateLimit = (root: Record<string, unknown>): Record<string, unknown> =>
   throw new ProviderError('Codex response did not contain rate_limit.')
 }
 
-const readResetNotice = (root: Record<string, unknown>): string | null => {
-  const resetCredits = getObject(root, 'rate_limit_reset_credits') ?? root
+/**
+ * Formats a date as `DD.MM` with zero padding, independent of the OS locale.
+ *
+ * @param date - Date to format
+ * @returns Day and month string such as `22.10`
+ */
+const formatDayMonth = (date: Date): string => {
+  const dd = String(date.getDate()).padStart(2, '0')
+  const mm = String(date.getMonth() + 1).padStart(2, '0')
+  return `${dd}.${mm}`
+}
+
+const readResetNotice = (root: Record<string, unknown>, now: Date): string | null => {
+  // The usage payload carries only the reset summary (`available_count`);
+  // per-credit rows are merged in from the details endpoint by fetchUsage.
+  const resetCredits = getObject(root, 'rate_limit_reset_credits')
+  if (!resetCredits) return null
   const availableCount = getNumber(resetCredits, 'available_count')
   if (availableCount === null || availableCount <= 0 || availableCount % 1 !== 0) return null
   const countLabel = availableCount === 1 ? '1 reset' : `${availableCount} resets`
@@ -65,17 +80,45 @@ const readResetNotice = (root: Record<string, unknown>): string | null => {
   let nearest: Date | null = null
   if (credits) {
     for (const credit of credits) {
+      // Only redeemable credits carry a usable expiry; anything else is ignored.
       if ((getString(credit, 'status') ?? '').toLowerCase() !== 'available') continue
       const expiresAt = getString(credit, 'expires_at')
-      const parsed = expiresAt ? new Date(expiresAt) : null
-      if (parsed && !Number.isNaN(parsed.getTime()) && (nearest === null || parsed < nearest)) {
+      if (!expiresAt) continue
+      const parsed = new Date(expiresAt)
+      if (Number.isNaN(parsed.getTime())) continue
+      if (parsed.getTime() > now.getTime() && (nearest === null || parsed < nearest)) {
         nearest = parsed
       }
     }
   }
   if (nearest === null) return countLabel
-  const ddmm = nearest.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' })
-  return `${countLabel} exp ${ddmm}`
+  return `${countLabel} expires ${formatDayMonth(nearest)}`
+}
+
+/**
+ * Merges reset-credit detail rows into the usage payload.
+ *
+ * The usage summary count stays authoritative: detail rows only supply expiry
+ * dates, and a sparse detail payload never zeroes a good usage count.
+ *
+ * @param root - Usage payload to merge into
+ * @param document - Raw JSON document from the reset-credits endpoint
+ */
+const mergeResetCreditDetails = (root: Record<string, unknown>, document: unknown): void => {
+  if (!document || typeof document !== 'object' || Array.isArray(document)) return
+  const record = document as Record<string, unknown>
+  const rows = getArray(record, 'credits')
+  const count = getNumber(record, 'available_count')
+  if ((rows === null || rows.length === 0) && (count === null || count <= 0)) return
+  const existing = getObject(root, 'rate_limit_reset_credits')
+  if (existing) {
+    if (rows !== null && rows.length > 0) existing.credits = rows
+    if (count !== null && count > 0) existing.available_count = count
+  } else if (count !== null && count > 0) {
+    root.rate_limit_reset_credits = { available_count: count, ...(rows ? { credits: rows } : {}) }
+  } else if (rows !== null && rows.length > 0) {
+    root.rate_limit_reset_credits = { available_count: rows.length, credits: rows }
+  }
 }
 
 const readWindow = (
@@ -153,16 +196,23 @@ export default class CodexProvider extends BaseOAuthProvider<CodexAuth> {
   }
 
   protected async fetchUsage(auth: CodexAuth): Promise<unknown> {
-    const document = (await getJson(
-      new Request(USAGE_ENDPOINT, { headers: codexHeaders(auth.accessToken, auth.accountId) }),
-    )) as unknown
+    const headers = codexHeaders(auth.accessToken, auth.accountId)
+    const [document, resetCredits] = await Promise.all([
+      getJson(new Request(USAGE_ENDPOINT, { headers })),
+      getJson(new Request(RESET_CREDITS_ENDPOINT, { headers })).catch(() => null),
+    ])
     if (!document || typeof document !== 'object' || Array.isArray(document)) {
       throw new ProviderError('Codex usage response was not a JSON object.')
     }
-    return document as Record<string, unknown>
+    const root = document as Record<string, unknown>
+    // The usage payload carries only the reset summary, so merge the dedicated
+    // reset-credits payload best-effort for the notice expiry date.
+    // A failed supplemental call leaves the summary untouched (count-only notice).
+    mergeResetCreditDetails(root, resetCredits)
+    return root
   }
 
-  protected buildResult(raw: unknown, auth: CodexAuth, now: Date): MetricResult | null {
+  protected buildResult(raw: unknown, _auth: CodexAuth, now: Date): MetricResult | null {
     const root = raw as Record<string, unknown>
     const plan = readPlanLabel(getString(root, 'plan_type'))
     const rateLimit = getRateLimit(root)
@@ -176,28 +226,10 @@ export default class CodexProvider extends BaseOAuthProvider<CodexAuth> {
     if (session) windows.push(session)
     if (weekly) windows.push(weekly)
 
-    // Supplemental reset-credits fetch happens asynchronously after this returns.
-    // We fire it best-effort and update via the shared notice field.
-    const notice = readResetNotice(root)
-    void this.fetchResetNotice(auth.accessToken, auth.accountId).catch(() => {})
+    // Reset-credits expiry was merged into the payload by fetchUsage.
+    const notice = readResetNotice(root, now)
 
     return { providerName: 'Codex', plan, windows, notice }
-  }
-
-  private async fetchResetNotice(accessToken: string, accountId?: string | null): Promise<void> {
-    // Best-effort supplemental call — result is not returned synchronously
-    // but future refreshes will pick up updated reset credits.
-    try {
-      const document = (await getJson(
-        new Request(RESET_CREDITS_ENDPOINT, {
-          headers: codexHeaders(accessToken, accountId),
-        }),
-      )) as unknown
-      // Result is used indirectly through the next refresh cycle.
-      void document
-    } catch {
-      // Supplemental data; ignore failures.
-    }
   }
 
   /** Public helpers for window-start capability. */
