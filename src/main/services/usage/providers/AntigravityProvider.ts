@@ -41,8 +41,17 @@ const windowRank = (label: string): number => {
 
 const mapWindowLabel = (label: string): string => (label === '5h' ? 'Session' : label)
 
-const readPlanLabel = (tierId: string | null): string | null => {
+export const readPlanLabel = (tierId: string | null): string | null => {
   if (!tierId || tierId.trim() === '') return null
+  const normalized = tierId.trim().toLowerCase()
+  if (normalized.includes('ultra')) return 'Ultra'
+  if (normalized.includes('pro')) return 'Pro'
+  if (normalized.includes('advanced')) return 'Advanced'
+  if (normalized.includes('team')) return 'Team'
+  if (normalized.includes('business')) return 'Business'
+  if (normalized.includes('enterprise')) return 'Enterprise'
+  if (normalized.includes('standard')) return 'Standard'
+  if (normalized.includes('free')) return 'Free'
   const parts = tierId.split('-', 2)
   return capitalize(parts[0] ?? tierId)
 }
@@ -74,6 +83,7 @@ const cpuArch = (): string => {
 }
 
 export default class AntigravityProvider extends BaseOAuthProvider<AntigravityAuth> {
+  private cachedAccessToken: string | null = null
   private cachedProjectId: string | null = null
   private cachedTierId: string | null = null
   private cachedCliVersion: string | null = null
@@ -154,11 +164,12 @@ export default class AntigravityProvider extends BaseOAuthProvider<AntigravityAu
   // -----------------------------------------------------------------------
 
   private async ensureInitialized(auth: AntigravityAuth): Promise<void> {
-    if (this.cachedProjectId !== null) return
+    if (this.cachedProjectId !== null && this.cachedAccessToken === auth.accessToken) return
     const [project, version] = await Promise.all([
       this.fetchProjectAsync(auth),
       this.fetchLatestVersionAsync(),
     ])
+    this.cachedAccessToken = auth.accessToken
     this.cachedProjectId = project.projectId
     this.cachedTierId = project.tierId
     this.cachedCliVersion = version
@@ -186,8 +197,13 @@ export default class AntigravityProvider extends BaseOAuthProvider<AntigravityAu
         'Antigravity loadCodeAssist response did not contain cloudaicompanionProject.',
       )
     }
+    const paidTier = getObject(root, 'paidTier')
     const currentTier = getObject(root, 'currentTier')
-    const tierId = currentTier ? getString(currentTier, 'id') : null
+    const paidTierId = paidTier ? (getString(paidTier, 'id') ?? getString(paidTier, 'name')) : null
+    const currentTierId = currentTier
+      ? (getString(currentTier, 'id') ?? getString(currentTier, 'name'))
+      : null
+    const tierId = paidTierId ?? currentTierId
     return { projectId, tierId }
   }
 
