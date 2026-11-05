@@ -260,6 +260,17 @@ export const PROVIDER_DESCRIPTORS: ProviderDescriptor[] = [
     startWindowAfterReset: false,
     barProvider: false,
   },
+  {
+    id: 'refuseless',
+    name: 'Refuseless',
+    displayOrder: 121,
+    authenticationKind: 'apiKey',
+    credentialName: 'REFUSELESS_API_KEY',
+    settingsOrder: 23,
+    iconKey: null,
+    startWindowAfterReset: false,
+    barProvider: false,
+  },
 ]
 
 /** Fast lookup: provider ID → descriptor. */

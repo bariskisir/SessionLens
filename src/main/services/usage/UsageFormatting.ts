@@ -12,6 +12,46 @@
  */
 export const currency = (value: number, symbol = '$'): string => `${symbol}${value.toFixed(2)}`
 
+/** Currency symbols keyed by ISO 4217 unit code for balance display. */
+const CURRENCY_SYMBOLS: Record<string, string> = {
+  usd: '$',
+  eur: '€',
+  gbp: '£',
+  jpy: '¥',
+  cny: '¥',
+  krw: '₩',
+  inr: '₹',
+  rub: '₽',
+  try: '₺',
+  brl: 'R$',
+  cad: 'C$',
+  aud: 'A$',
+  chf: 'CHF',
+  sek: 'kr',
+  nok: 'kr',
+  dkk: 'kr',
+  pln: 'zł',
+  mxn: 'MX$',
+  zar: 'R',
+  aed: 'AED',
+  sar: 'SAR',
+}
+
+/**
+ * Formats a balance amount using the symbol for its unit code. Unknown units
+ * keep their original label after the amount.
+ *
+ * @param value - Numeric balance amount
+ * @param unit - Currency or credit unit reported by the provider
+ * @returns Formatted balance string
+ */
+export const currencyForUnit = (value: number, unit: string | null | undefined): string => {
+  const label = unit?.trim()
+  if (!label) return currency(value)
+  const symbol = CURRENCY_SYMBOLS[label.toLowerCase()]
+  return symbol ? currency(value, symbol) : `${value.toFixed(2)} ${label}`
+}
+
 /**
  * Capitalizes the first character of a plan or tier token string for display.
  *

@@ -40,6 +40,7 @@ import CrofProvider from '../services/usage/providers/CrofProvider'
 import MoonshotProvider from '../services/usage/providers/MoonshotProvider'
 import PoeProvider from '../services/usage/providers/PoeProvider'
 import DeepgramProvider from '../services/usage/providers/DeepgramProvider'
+import RefuselessProvider from '../services/usage/providers/RefuselessProvider'
 
 import type { ProviderDescriptor } from '@shared/types'
 
@@ -88,6 +89,7 @@ export const ALL_PROVIDERS: IProvider[] = [
   new MoonshotProvider(descriptor('moonshot')),
   new PoeProvider(descriptor('poe')),
   new DeepgramProvider(descriptor('deepgram')),
+  new RefuselessProvider(descriptor('refuseless')),
 ]
 
 /** Fast lookup by provider ID. */
