@@ -15,6 +15,7 @@ export {
   TIME_FORMATS,
   LOG_LEVELS,
   ICON_LAYOUT_MODES,
+  TOOLTIP_POSITIONS,
   PROVIDER_TYPES,
   DEFAULT_SMALL_MODEL_SELECTOR,
   REFRESH_MAX_MINUTES,
@@ -36,6 +37,7 @@ import type {
   TIME_FORMATS as _TIME_FORMATS,
   LOG_LEVELS as _LOG_LEVELS,
   ICON_LAYOUT_MODES as _ICON_LAYOUT_MODES,
+  TOOLTIP_POSITIONS as _TOOLTIP_POSITIONS,
   PROVIDER_TYPES as _PROVIDER_TYPES,
 } from './config/constants'
 
@@ -45,6 +47,7 @@ export type NavbarPosition = (typeof _NAVBAR_POSITIONS)[number]
 export type TimeFormat = (typeof _TIME_FORMATS)[number]
 export type LogLevel = (typeof _LOG_LEVELS)[number]
 export type IconLayoutMode = (typeof _ICON_LAYOUT_MODES)[number]
+export type TooltipPosition = (typeof _TOOLTIP_POSITIONS)[number]
 export type ProviderType = (typeof _PROVIDER_TYPES)[number]
 export type DesktopPlatform = 'win32' | 'darwin' | 'linux'
 
@@ -89,6 +92,7 @@ export interface TrayIconLayoutSettings {
 /** Tray icon and tooltip presentation preferences. */
 export interface VisualSettings {
   scale: number
+  position: TooltipPosition
   iconLayout: TrayIconLayoutSettings
 }
 

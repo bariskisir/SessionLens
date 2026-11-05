@@ -57,6 +57,12 @@ describe('parsePersistedSettings', () => {
     expect(parsePersistedSettings(olderSettings).unattendedUpdates).toBe(true)
   })
 
+  it('defaults older settings to automatic tooltip placement', () => {
+    const { position: _removed, ...olderVisual } = DEFAULT_SETTINGS.visual
+    const result = parsePersistedSettings({ ...DEFAULT_SETTINGS, visual: olderVisual })
+    expect(result.visual.position).toBe('auto')
+  })
+
   it('falls back safely when a generic preference is invalid', () => {
     const result = parsePersistedSettings({ ...DEFAULT_SETTINGS, theme: 'neon' })
     expect(result.theme).toBe('system')
@@ -94,6 +100,16 @@ describe('settingsSchema', () => {
       startMinimized: true,
     })
     expect(result.success).toBe(true)
+  })
+
+  it('accepts every tooltip placement', () => {
+    for (const position of ['auto', 'above', 'below'] as const) {
+      const result = settingsSchema.safeParse({
+        ...DEFAULT_SETTINGS,
+        visual: { ...DEFAULT_SETTINGS.visual, position },
+      })
+      expect(result.success).toBe(true)
+    }
   })
 })
 

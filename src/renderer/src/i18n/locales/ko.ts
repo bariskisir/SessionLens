@@ -122,6 +122,14 @@ const ko = {
   icon: {
     tooltipScale: '도구 설명 배율',
     tooltipScaleDescription: '트레이 도구 설명의 크기를 조정합니다.',
+    tooltipPosition: '도구 설명 위치',
+    tooltipPositionDescription:
+      '도구 설명을 아이콘 위 또는 아래에 표시할지 선택합니다. 자동은 데스크톱 패널 위치를 따릅니다.',
+    tooltipPositions: {
+      auto: '자동',
+      above: '위',
+      below: '아래',
+    },
     layoutMode: '아이콘 레이아웃',
     layoutModeDescription: '사용량 막대가 트레이 아이콘을 채우는 방식을 선택합니다.',
     layoutModes: {

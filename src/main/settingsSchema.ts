@@ -16,6 +16,7 @@ import {
   REFRESH_MAX_MINUTES,
   TIME_FORMATS,
   THEME_MODES,
+  TOOLTIP_POSITIONS,
   VISUAL_SCALE_LIMITS,
   type AppSettings,
   type AppSettingsPatch,
@@ -23,6 +24,7 @@ import {
   type NotificationSettings,
   type ProviderDescriptor,
   type ProviderSettings,
+  type TooltipPosition,
   type TrayIconLayoutSettings,
 } from '@shared/types'
 import { z } from 'zod'
@@ -62,9 +64,12 @@ const trayIconLayoutSchema = z.object({
   bars: z.record(z.string(), z.number()),
 })
 
-/** Zod schema for visual settings (scale, icon layout). */
+/** Zod schema for visual settings (scale, tooltip position, icon layout). */
 const visualSettingsSchema = z.object({
   scale: z.number().min(VISUAL_SCALE_LIMITS.min).max(VISUAL_SCALE_LIMITS.max),
+  // Older settings documents predate placement; default them to automatic
+  // instead of rejecting the whole document.
+  position: z.enum(TOOLTIP_POSITIONS).catch('auto'),
   iconLayout: trayIconLayoutSchema,
 })
 
@@ -204,6 +209,15 @@ const normalizeNotification = (notification: NotificationSettings): Notification
 }
 
 /**
+ * Keeps only supported tooltip placements, falling back to automatic detection.
+ *
+ * @param position - Raw tooltip placement
+ * @returns Supported TooltipPosition value
+ */
+const normalizeTooltipPosition = (position: TooltipPosition): TooltipPosition =>
+  TOOLTIP_POSITIONS.includes(position) ? position : DEFAULT_SETTINGS.visual.position
+
+/**
  * Normalizes icon layout bars by dropping blank keys and non-positive weights.
  *
  * @param layout - TrayIconLayoutSettings object
@@ -322,6 +336,7 @@ export const normalizeSettings = (
         VISUAL_SCALE_LIMITS.max,
         Math.max(VISUAL_SCALE_LIMITS.min, settings.visual.scale),
       ),
+      position: normalizeTooltipPosition(settings.visual.position),
       iconLayout: normalizeIconLayout(settings.visual.iconLayout),
     },
     models: {
@@ -360,6 +375,7 @@ export const normalizeSettingsPatch = (patch: AppSettingsPatch): AppSettingsPatc
         VISUAL_SCALE_LIMITS.max,
         Math.max(VISUAL_SCALE_LIMITS.min, patch.visual.scale ?? DEFAULT_SETTINGS.visual.scale),
       ),
+      position: normalizeTooltipPosition(patch.visual.position ?? DEFAULT_SETTINGS.visual.position),
       iconLayout: normalizeIconLayout(
         patch.visual.iconLayout ?? DEFAULT_SETTINGS.visual.iconLayout,
       ),

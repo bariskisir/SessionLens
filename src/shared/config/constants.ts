@@ -18,6 +18,9 @@ export const LOG_LEVELS = ['error', 'warn', 'info', 'debug', 'verbose'] as const
 
 export const ICON_LAYOUT_MODES = ['auto', 'manual'] as const
 
+/** Placement of the tray tooltip relative to the tray icon. */
+export const TOOLTIP_POSITIONS = ['auto', 'above', 'below'] as const
+
 export const PROVIDER_TYPES = ['oauth', 'apiKey'] as const
 
 export const DEFAULT_SMALL_MODEL_SELECTOR = 'nano,mini,haiku,lite,flash,oss'

@@ -27,7 +27,7 @@
 - **Threshold notifications** via Windows balloon, Telegram, and Discord when limits cross high or critical levels
 - **Warm-window requests** that automatically start a new session window after a usage reset so your tool is ready when you are
 - **20+ AI providers** supported out of the box with API-key and OAuth authentication
-- **Customizable refresh interval**, notification thresholds, tooltip scale, and icon layout
+- **Customizable refresh interval**, notification thresholds, tooltip placement and scale, and icon layout
 
 ## Install
 

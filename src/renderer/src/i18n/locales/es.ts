@@ -124,6 +124,14 @@ const es = {
   icon: {
     tooltipScale: 'Escala de la información',
     tooltipScaleDescription: 'Ajusta el tamaño de la información sobre herramientas de la bandeja.',
+    tooltipPosition: 'Posición de la información',
+    tooltipPositionDescription:
+      'Elige si la información sobre herramientas se abre encima o debajo del icono. Automático sigue la posición del panel del escritorio.',
+    tooltipPositions: {
+      auto: 'Automático',
+      above: 'Encima',
+      below: 'Debajo',
+    },
     layoutMode: 'Diseño del icono',
     layoutModeDescription: 'Elige cómo las barras de uso rellenan el icono de la bandeja.',
     layoutModes: {

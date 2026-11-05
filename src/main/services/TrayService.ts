@@ -4,16 +4,23 @@
 
 import { join } from 'node:path'
 import { app, BrowserWindow, Menu, nativeImage, Notification, screen, Tray } from 'electron'
+import type { Rectangle } from 'electron'
 import type { NotificationLevel } from '@shared/types'
 import { IpcChannel } from '@shared/IpcChannel'
-import type { AppSettings, TooltipCard } from '@shared/types'
+import type { AppSettings, TooltipCard, TooltipPosition } from '@shared/types'
 import type { IconBar } from './usage/IconLayout'
 import { renderTrayIconPng, TRAY_ICON_SIZE } from './usage/TrayIconRenderer'
 import type LoggerService from './LoggerService'
 
-type TraySettings = Pick<AppSettings, 'showTrayIcon' | 'minimizeToTrayOnClose'>
+type TraySettings = Pick<AppSettings, 'showTrayIcon' | 'minimizeToTrayOnClose'> &
+  Partial<Pick<AppSettings, 'visual'>>
+
+type TooltipSide = 'above' | 'below'
 
 const TOOLTIP_MARGIN = 8
+
+/** Linux desktops whose default panel sits along the top edge. */
+const TOP_PANEL_DESKTOPS = /(gnome|unity|pantheon|budgie|xfce|mate)/i
 
 /** Maximum wait for the hidden tooltip renderer to answer a measure request. */
 const TOOLTIP_MEASURE_TIMEOUT_MS = 3_000
@@ -44,6 +51,38 @@ export function withTimeout<T>(promise: Promise<T>, timeoutMs: number): Promise<
   })
 }
 
+/**
+ * Reads the desktop identifiers exported by Linux display managers.
+ *
+ * @param environment - Environment variables to inspect
+ * @returns Combined desktop identifiers, or an empty string
+ */
+export const detectDesktopEnvironment = (environment: NodeJS.ProcessEnv = process.env): string =>
+  [environment.XDG_CURRENT_DESKTOP, environment.XDG_SESSION_DESKTOP, environment.DESKTOP_SESSION]
+    .filter((value): value is string => Boolean(value))
+    .join(':')
+
+/**
+ * Resolves the preferred popup side from the user setting or the platform.
+ * Windows and KDE keep their panel at the bottom, while GNOME and macOS place
+ * theirs at the top, so automatic placement mirrors the desktop's panel.
+ *
+ * @param position - Configured tooltip position
+ * @param platform - Host platform
+ * @param desktopEnvironment - Linux desktop identifiers
+ * @returns Preferred side relative to the tray icon
+ */
+export const resolveTooltipSide = (
+  position: TooltipPosition,
+  platform: NodeJS.Platform = process.platform,
+  desktopEnvironment: string = detectDesktopEnvironment(),
+): TooltipSide => {
+  if (position === 'above' || position === 'below') return position
+  if (platform === 'win32') return 'above'
+  if (platform === 'darwin') return 'below'
+  return TOP_PANEL_DESKTOPS.test(desktopEnvironment) ? 'below' : 'above'
+}
+
 export default class TrayService {
   private tray: Tray | null = null
   private tooltip: BrowserWindow | null = null
@@ -53,6 +92,8 @@ export default class TrayService {
   private hovering = false
   private refreshUsage: (() => void) | null = null
   private settings: TraySettings
+  private tooltipSide: TooltipSide
+  private readonly desktopEnvironment: string
   private quitting = false
 
   public constructor(
@@ -60,13 +101,25 @@ export default class TrayService {
     settings: TraySettings,
     private readonly logger: LoggerService,
     private readonly platform: NodeJS.Platform = process.platform,
+    desktopEnvironment: string = detectDesktopEnvironment(),
   ) {
     this.settings = { ...settings }
+    this.desktopEnvironment = desktopEnvironment
+    this.tooltipSide = resolveTooltipSide(
+      settings.visual?.position ?? 'auto',
+      platform,
+      desktopEnvironment,
+    )
     this.updateTrayIcon()
   }
 
   public applySettings(settings: TraySettings): void {
     this.settings = { ...settings }
+    this.tooltipSide = resolveTooltipSide(
+      settings.visual?.position ?? 'auto',
+      this.platform,
+      this.desktopEnvironment,
+    )
     this.updateTrayIcon()
   }
 
@@ -153,16 +206,13 @@ export default class TrayService {
     if (this.tray) return
     try {
       const tray = new Tray(this.defaultTrayImage())
-      tray.setContextMenu(
-        Menu.buildFromTemplate([
-          { label: 'Settings', click: () => this.showSettings() },
-          { label: 'Refresh', click: () => this.refreshUsage?.() },
-          { label: 'Exit', role: 'quit' },
-        ]),
-      )
+      this.tray = tray
+      this.updateContextMenu()
       tray.on('click', () => {
-        // Linux SNI has no hover events, so the primary activation (single
-        // click, sent by the AppIndicator host) toggles the usage popup.
+        // Linux SNI has no hover events, so activation toggles the usage
+        // popup. Hosts that treat a single left click as activation send it
+        // directly; GNOME's AppIndicator extension only sends it for a double
+        // or middle click and opens the context menu on a single left click.
         if (this.platform === 'linux') this.toggleTooltipOnLinuxClick()
         else this.showWindow()
       })
@@ -171,13 +221,36 @@ export default class TrayService {
       // No tooltip is ever set: on Windows `setToolTip` turns the native hover
       // tooltip on (an empty string still draws an empty rounded box over the
       // tray icon), while leaving it unset keeps the custom popup alone.
-      this.tray = tray
       // Pre-create the popup so the first hover is as instant as later ones.
       void this.ensureTooltipWindow()
     } catch (error) {
       this.logger.error('TrayService', 'System tray icon could not be created.', error)
       this.tray = null
     }
+  }
+
+  /** Builds the action menu shown by the tray host. */
+  private updateContextMenu(): void {
+    const tray = this.tray
+    if (!tray) return
+    tray.setContextMenu(
+      Menu.buildFromTemplate([
+        // Linux hosts that open this menu on a single left click cannot send
+        // an activation (GNOME's AppIndicator extension is one), so expose the
+        // HTML popup here as well and hint at the activation gesture.
+        ...(this.platform === 'linux'
+          ? [
+              {
+                label: 'Usage (double-click)',
+                click: () => this.toggleTooltipOnLinuxClick(),
+              },
+            ]
+          : []),
+        { label: 'Settings', click: () => this.showSettings() },
+        { label: 'Refresh', click: () => this.refreshUsage?.() },
+        { label: 'Exit', role: 'quit' },
+      ]),
+    )
   }
 
   private onTrayEnter(): void {
@@ -254,8 +327,7 @@ export default class TrayService {
     if (this.tooltip !== tooltip || tooltip.isDestroyed() || tooltip.isVisible()) return
     if (this.quitting || !this.hovering) return
     try {
-      if (this.platform === 'linux') this.placeAndShowOnLinux(tooltip, size)
-      else this.placeAndShow(tooltip, size)
+      this.placeAndShow(tooltip, size)
     } catch (error) {
       this.logger.warn('TrayService', 'Tray tooltip popup could not be shown.', error)
       this.invalidateTooltipWindow(tooltip)
@@ -313,28 +385,34 @@ export default class TrayService {
     }
   }
 
-  /** Anchors the popup inside the display work area next to the tray. */
+  /**
+   * Anchors the popup above or below the tray icon, inside the display work
+   * area. Linux AppIndicator hosts often expose no tray geometry, so the
+   * fallback anchors against the matching corner of the work area instead.
+   */
   private placeAndShow(tooltip: BrowserWindow, size: { width: number; height: number }): void {
-    const tray = this.tray
-    if (!tray) return
-    const bounds = tray.getBounds()
-    const work = screen.getDisplayNearestPoint({ x: bounds.x, y: bounds.y }).workArea
-    const width = Math.min(size.width, work.width - TOOLTIP_MARGIN * 2)
-    const height = Math.min(size.height, work.height - TOOLTIP_MARGIN * 2)
-    const x = clamp(
-      bounds.x + Math.floor(bounds.width / 2) - Math.floor(width / 2),
-      work.x + TOOLTIP_MARGIN,
-      work.x + work.width - width - TOOLTIP_MARGIN,
-    )
-    const trayIsBelow = bounds.y >= work.y + Math.floor(work.height / 2)
-    const preferredY = trayIsBelow
-      ? bounds.y - height - TOOLTIP_MARGIN
-      : bounds.y + bounds.height + TOOLTIP_MARGIN
-    const y = clamp(
-      preferredY,
-      work.y + TOOLTIP_MARGIN,
-      work.y + work.height - height - TOOLTIP_MARGIN,
-    )
+    const anchor = this.trayAnchor()
+    const display = anchor
+      ? screen.getDisplayNearestPoint({
+          x: anchor.x + Math.floor(anchor.width / 2),
+          y: anchor.y + Math.floor(anchor.height / 2),
+        })
+      : screen.getPrimaryDisplay()
+    const work = display.workArea
+    const width = Math.max(1, Math.min(size.width, work.width - TOOLTIP_MARGIN * 2))
+    const height = Math.max(1, Math.min(size.height, work.height - TOOLTIP_MARGIN * 2))
+    const x = anchor
+      ? clamp(
+          anchor.x + Math.floor(anchor.width / 2) - Math.floor(width / 2),
+          work.x + TOOLTIP_MARGIN,
+          work.x + work.width - width - TOOLTIP_MARGIN,
+        )
+      : work.x + work.width - width - TOOLTIP_MARGIN
+    const y = anchor
+      ? this.verticalPosition(anchor, height, work)
+      : this.tooltipSide === 'below'
+        ? work.y + TOOLTIP_MARGIN
+        : work.y + work.height - height - TOOLTIP_MARGIN
     tooltip.setBounds({ x, y, width, height })
     tooltip.showInactive()
     // Windows keeps the topmost style across hide/show cycles, but a
@@ -347,25 +425,37 @@ export default class TrayService {
     tooltip.moveTop()
   }
 
-  /**
-   * Places the popup at the bottom-right of the display work area. Aligning
-   * against the measured size keeps the popup fully visible at every scale.
-   */
-  private placeAndShowOnLinux(
-    tooltip: BrowserWindow,
-    size: { width: number; height: number },
-  ): void {
-    const display = screen.getPrimaryDisplay()
-    const work = display.workArea
-    const width = Math.max(TOOLTIP_MARGIN, Math.min(size.width, work.width - TOOLTIP_MARGIN * 2))
-    const height = Math.max(TOOLTIP_MARGIN, Math.min(size.height, work.height - TOOLTIP_MARGIN * 2))
-    const left = work.x + work.width - width - TOOLTIP_MARGIN
-    const top = work.y + work.height - height - TOOLTIP_MARGIN
-    tooltip.setBounds({ x: left, y: top, width, height })
-    tooltip.showInactive()
-    tooltip.setAlwaysOnTop(false)
-    tooltip.setAlwaysOnTop(true, 'pop-up-menu')
-    tooltip.moveTop()
+  /** Returns the tray icon rectangle when the window manager exposes one. */
+  private trayAnchor(): Rectangle | null {
+    // Electron only implements getBounds() on macOS and Windows; Linux
+    // AppIndicator hosts own the icon geometry and report nothing useful.
+    if (this.platform === 'linux') return null
+    const bounds = this.tray?.getBounds()
+    if (!bounds || bounds.width <= 0 || bounds.height <= 0) return null
+    const center = {
+      x: bounds.x + Math.floor(bounds.width / 2),
+      y: bounds.y + Math.floor(bounds.height / 2),
+    }
+    const display = screen.getDisplayNearestPoint(center).bounds
+    const isInside =
+      center.x >= display.x &&
+      center.x <= display.x + display.width &&
+      center.y >= display.y &&
+      center.y <= display.y + display.height
+    return isInside ? bounds : null
+  }
+
+  /** Picks the configured side, falling back to the side that fits on screen. */
+  private verticalPosition(anchor: Rectangle, height: number, work: Rectangle): number {
+    const minY = work.y + TOOLTIP_MARGIN
+    const maxY = work.y + work.height - height - TOOLTIP_MARGIN
+    const above = anchor.y - height - TOOLTIP_MARGIN
+    const below = anchor.y + anchor.height + TOOLTIP_MARGIN
+    const preferred = this.tooltipSide === 'above' ? above : below
+    if (preferred >= minY && preferred <= maxY) return preferred
+    const opposite = this.tooltipSide === 'above' ? below : above
+    if (opposite >= minY && opposite <= maxY) return opposite
+    return clamp(preferred, minY, maxY)
   }
 
   private showWindow(): void {

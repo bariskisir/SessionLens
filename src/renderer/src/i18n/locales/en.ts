@@ -124,6 +124,14 @@ const en = {
   icon: {
     tooltipScale: 'Tooltip scale',
     tooltipScaleDescription: 'Adjust the size of the tray tooltip.',
+    tooltipPosition: 'Tooltip position',
+    tooltipPositionDescription:
+      'Choose whether the tray tooltip opens above or below the icon. Automatic follows your desktop panel.',
+    tooltipPositions: {
+      auto: 'Auto',
+      above: 'Above',
+      below: 'Below',
+    },
     layoutMode: 'Icon layout',
     layoutModeDescription: 'Choose how session lens fill the tray icon.',
     layoutModes: {

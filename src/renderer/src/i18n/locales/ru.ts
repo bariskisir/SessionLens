@@ -124,6 +124,14 @@ const ru = {
   icon: {
     tooltipScale: 'Масштаб подсказки',
     tooltipScaleDescription: 'Настройте размер подсказки трея.',
+    tooltipPosition: 'Положение подсказки',
+    tooltipPositionDescription:
+      'Выберите, будет ли подсказка открываться над или под значком. «Автоматически» учитывает расположение панели рабочего стола.',
+    tooltipPositions: {
+      auto: 'Автоматически',
+      above: 'Сверху',
+      below: 'Снизу',
+    },
     layoutMode: 'Макет значка',
     layoutModeDescription: 'Выберите, как полосы использования заполняют значок трея.',
     layoutModes: {

@@ -1,12 +1,12 @@
 /**
  * @file TooltipSettingsSection.tsx
- * @description Renders the system tray tooltip UI scale slider and zoom control settings.
+ * @description Renders the system tray tooltip placement, scale, and zoom control settings.
  */
 
-import { Button, Tooltip } from 'antd'
+import { Button, Segmented, Tooltip } from 'antd'
 import { Minus, Plus, RotateCcw } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { VISUAL_SCALE_LIMITS } from '@shared/types'
+import { VISUAL_SCALE_LIMITS, type TooltipPosition } from '@shared/types'
 import { useSettingsActions } from '@renderer/hooks/useSettingsActions'
 import { useAppSelector } from '@renderer/store'
 import SettingLabel from '../components/SettingLabel'
@@ -42,6 +42,27 @@ const TooltipSettingsSection = (): React.JSX.Element => {
     <div className={styles.settingContainer}>
       <h2 className={styles.groupTitle}>{t('settings.tooltip')}</h2>
       <section className={styles.settingGroup}>
+        <div className={styles.settingRow}>
+          <SettingLabel
+            title={t('icon.tooltipPosition')}
+            description={t('icon.tooltipPositionDescription')}
+          />
+          <div className={styles.settingControl}>
+            <Segmented
+              value={settings.visual.position}
+              options={[
+                { value: 'auto', label: t('icon.tooltipPositions.auto') },
+                { value: 'above', label: t('icon.tooltipPositions.above') },
+                { value: 'below', label: t('icon.tooltipPositions.below') },
+              ]}
+              onChange={(position) =>
+                void settingsActions.saveSettings({
+                  visual: { ...settings.visual, position: position as TooltipPosition },
+                })
+              }
+            />
+          </div>
+        </div>
         <div className={styles.settingRow}>
           <SettingLabel
             title={t('icon.tooltipScale')}

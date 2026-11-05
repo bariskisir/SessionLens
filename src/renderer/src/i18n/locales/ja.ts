@@ -123,6 +123,14 @@ const ja = {
   icon: {
     tooltipScale: 'ツールチップの倍率',
     tooltipScaleDescription: 'トレイのツールチップのサイズを調整します。',
+    tooltipPosition: 'ツールチップの位置',
+    tooltipPositionDescription:
+      'ツールチップをアイコンの上または下に表示するかを選択します。自動ではデスクトップパネルの位置に従います。',
+    tooltipPositions: {
+      auto: '自動',
+      above: '上',
+      below: '下',
+    },
     layoutMode: 'アイコンのレイアウト',
     layoutModeDescription: '使用量バーがトレイアイコンをどのように埋めるかを選択します。',
     layoutModes: {

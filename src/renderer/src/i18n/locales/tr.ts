@@ -122,6 +122,14 @@ const tr = {
   icon: {
     tooltipScale: 'İpucu boyutu',
     tooltipScaleDescription: 'Tepsi ipucunun boyutunu ayarlayın.',
+    tooltipPosition: 'İpucu konumu',
+    tooltipPositionDescription:
+      'Tepsi ipucunun simgenin üstünde mi altında mı açılacağını seçin. Otomatik, masaüstü panelinizin konumunu izler.',
+    tooltipPositions: {
+      auto: 'Otomatik',
+      above: 'Üstte',
+      below: 'Altta',
+    },
     layoutMode: 'Simge düzeni',
     layoutModeDescription: 'Kullanım çubuklarının tepsi simgesini nasıl dolduracağını seçin.',
     layoutModes: {

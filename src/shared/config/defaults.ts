@@ -34,6 +34,7 @@ export const DEFAULT_SETTINGS: AppSettings = {
   notification: DEFAULT_NOTIFICATION,
   visual: {
     scale: VISUAL_SCALE_LIMITS.default,
+    position: 'auto',
     iconLayout: { mode: 'auto', bars: {} },
   },
   providers: [],

@@ -6,7 +6,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { BrowserWindow } from 'electron'
 import type { TooltipCard } from '@shared/types'
-import TrayService, { withTimeout } from '../src/main/services/TrayService'
+import TrayService, { resolveTooltipSide, withTimeout } from '../src/main/services/TrayService'
 import type LoggerService from '../src/main/services/LoggerService'
 
 const electronMocks = vi.hoisted(() => {
@@ -97,7 +97,10 @@ vi.mock('electron', () => ({
     createFromBuffer: vi.fn(() => ({ bufferPng: true })),
   },
   screen: {
-    getDisplayNearestPoint: vi.fn(() => ({ workArea: { x: 0, y: 0, width: 1920, height: 1080 } })),
+    getDisplayNearestPoint: vi.fn(() => ({
+      workArea: { x: 0, y: 0, width: 1920, height: 1080 },
+      bounds: { x: 0, y: 0, width: 1920, height: 1080 },
+    })),
     getCursorScreenPoint: vi.fn(() => ({ x: 960, y: 50 })),
     getPrimaryDisplay: vi.fn(() => ({
       workArea: { x: 0, y: 0, width: 1920, height: 1080 },
@@ -200,24 +203,100 @@ describe('TrayService', () => {
     expect(service.shouldMinimizeOnClose()).toBe(false)
   })
 
-  it('toggles the usage popup on tray activation when running on Linux', async () => {
+  it('opens the Linux popup below a GNOME top panel when tray geometry is unavailable', async () => {
     const service = new TrayService(
       createWindow(),
       { showTrayIcon: true, minimizeToTrayOnClose: true },
       createLogger(),
       'linux',
+      'ubuntu:GNOME',
     )
     const tray = electronMocks.instances[0]
     const tooltip = electronMocks.tooltipWindows[0]
+    if (tray) {
+      tray.bounds.width = 0
+      tray.bounds.height = 0
+    }
     service.setTooltip([sampleCard], 100)
 
     tray?.handlers.get('click')?.()
     await flushAsync()
     expect(tooltip?.showInactive).toHaveBeenCalledOnce()
-    expect(tooltip?.setBounds).toHaveBeenCalledWith({ x: 1632, y: 952, width: 280, height: 120 })
+    expect(tooltip?.setBounds).toHaveBeenCalledWith({ x: 1632, y: 8, width: 280, height: 120 })
 
     tray?.handlers.get('click')?.()
     expect(tooltip?.hide).toHaveBeenCalledOnce()
+
+    service.dispose()
+  })
+
+  it('opens the Linux popup above a KDE bottom panel when tray geometry is unavailable', async () => {
+    const service = new TrayService(
+      createWindow(),
+      { showTrayIcon: true, minimizeToTrayOnClose: true },
+      createLogger(),
+      'linux',
+      'KDE',
+    )
+    const tray = electronMocks.instances[0]
+    const tooltip = electronMocks.tooltipWindows[0]
+    if (tray) {
+      tray.bounds.width = 0
+      tray.bounds.height = 0
+    }
+    service.setTooltip([sampleCard], 100)
+
+    tray?.handlers.get('click')?.()
+    await flushAsync()
+    expect(tooltip?.setBounds).toHaveBeenCalledWith({ x: 1632, y: 952, width: 280, height: 120 })
+
+    service.dispose()
+  })
+
+  it('anchors the popup above a bottom Windows tray icon', async () => {
+    const service = new TrayService(
+      createWindow(),
+      { showTrayIcon: true, minimizeToTrayOnClose: true },
+      createLogger(),
+      'win32',
+    )
+    const tray = electronMocks.instances[0]
+    const tooltip = electronMocks.tooltipWindows[0]
+    if (tray) {
+      tray.bounds.x = 1800
+      tray.bounds.y = 1040
+    }
+    service.setTooltip([sampleCard], 100)
+
+    tray?.handlers.get('mouse-enter')?.()
+    await flushAsync()
+    expect(tooltip?.setBounds).toHaveBeenCalledWith({ x: 1632, y: 912, width: 280, height: 120 })
+
+    service.dispose()
+  })
+
+  it('honors an explicit below placement over the platform default', async () => {
+    const service = new TrayService(
+      createWindow(),
+      {
+        showTrayIcon: true,
+        minimizeToTrayOnClose: true,
+        visual: { scale: 100, position: 'below', iconLayout: { mode: 'auto', bars: {} } },
+      },
+      createLogger(),
+      'win32',
+    )
+    const tray = electronMocks.instances[0]
+    const tooltip = electronMocks.tooltipWindows[0]
+    if (tray) {
+      tray.bounds.x = 1800
+      tray.bounds.y = 0
+    }
+    service.setTooltip([sampleCard], 100)
+
+    tray?.handlers.get('mouse-enter')?.()
+    await flushAsync()
+    expect(tooltip?.setBounds).toHaveBeenCalledWith({ x: 1632, y: 28, width: 280, height: 120 })
 
     service.dispose()
   })
@@ -302,7 +381,12 @@ describe('TrayService', () => {
 
   it('builds an unseparated Settings, Refresh, Exit menu and opens settings', () => {
     const window = createWindow()
-    new TrayService(window, { showTrayIcon: true, minimizeToTrayOnClose: true }, createLogger())
+    new TrayService(
+      window,
+      { showTrayIcon: true, minimizeToTrayOnClose: true },
+      createLogger(),
+      'win32',
+    )
     const menu = electronMocks.menuTemplates[0] as Array<{
       label?: string
       type?: string
@@ -314,6 +398,54 @@ describe('TrayService', () => {
 
     menu[0]?.click?.()
     expect(window.webContents.send).toHaveBeenCalledWith('event:settings-open-requested')
+  })
+
+  it('offers a Usage entry with a double-click hint in the Linux tray menu', async () => {
+    const window = createWindow()
+    const service = new TrayService(
+      window,
+      { showTrayIcon: true, minimizeToTrayOnClose: true },
+      createLogger(),
+      'linux',
+      'ubuntu:GNOME',
+    )
+    const tray = electronMocks.instances[0]
+    const tooltip = electronMocks.tooltipWindows[0]
+
+    service.setTooltip([sampleCard], 100)
+    // The usage popup stays an HTML window; the menu only holds actions.
+    expect(electronMocks.menuTemplates).toHaveLength(1)
+    const menu = electronMocks.menuTemplates[0] as Array<{
+      label?: string
+      type?: string
+      click?: () => void
+    }>
+    expect(menu.map((item) => item.label)).toEqual([
+      'Usage (double-click)',
+      'Settings',
+      'Refresh',
+      'Exit',
+    ])
+    expect(menu.some((item) => item.type === 'separator')).toBe(false)
+    expect(menu.some((item) => item.label === 'Show usage')).toBe(false)
+
+    // Selecting Usage opens the HTML popup, selecting it again closes it.
+    menu[0]?.click?.()
+    await flushAsync()
+    expect(tooltip?.showInactive).toHaveBeenCalledOnce()
+    menu[0]?.click?.()
+    expect(tooltip?.hide).toHaveBeenCalledOnce()
+
+    // Tray activation does the same: single click on KDE, double or middle
+    // click on GNOME.
+    tray?.handlers.get('click')?.()
+    await flushAsync()
+    expect(tooltip?.showInactive).toHaveBeenCalledTimes(2)
+
+    menu.find((item) => item.label === 'Settings')?.click?.()
+    expect(window.webContents.send).toHaveBeenCalledWith('event:settings-open-requested')
+
+    service.dispose()
   })
 
   it('never sets a native tray tooltip', () => {
@@ -535,5 +667,19 @@ describe('TrayService', () => {
     } finally {
       vi.useRealTimers()
     }
+  })
+})
+
+describe('resolveTooltipSide', () => {
+  it('follows the platform panel when placement is automatic', () => {
+    expect(resolveTooltipSide('auto', 'win32', '')).toBe('above')
+    expect(resolveTooltipSide('auto', 'darwin', '')).toBe('below')
+    expect(resolveTooltipSide('auto', 'linux', 'ubuntu:GNOME')).toBe('below')
+    expect(resolveTooltipSide('auto', 'linux', 'KDE')).toBe('above')
+  })
+
+  it('honors explicit above and below placements', () => {
+    expect(resolveTooltipSide('above', 'darwin', 'GNOME')).toBe('above')
+    expect(resolveTooltipSide('below', 'win32', 'KDE')).toBe('below')
   })
 })

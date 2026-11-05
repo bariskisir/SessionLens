@@ -118,6 +118,13 @@ const zh = {
   icon: {
     tooltipScale: '提示框缩放',
     tooltipScaleDescription: '调整托盘提示框的大小。',
+    tooltipPosition: '提示框位置',
+    tooltipPositionDescription: '选择提示框在图标上方还是下方打开。自动会跟随桌面面板的位置。',
+    tooltipPositions: {
+      auto: '自动',
+      above: '上方',
+      below: '下方',
+    },
     layoutMode: '图标布局',
     layoutModeDescription: '选择使用量条如何填充托盘图标。',
     layoutModes: {

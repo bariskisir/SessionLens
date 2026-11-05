@@ -124,6 +124,14 @@ const fr = {
   icon: {
     tooltipScale: 'Échelle de l’infobulle',
     tooltipScaleDescription: 'Ajustez la taille de l’infobulle de la barre d’état.',
+    tooltipPosition: 'Position de l’infobulle',
+    tooltipPositionDescription:
+      'Choisissez si l’infobulle s’ouvre au-dessus ou en dessous de l’icône. Automatique suit la position du panneau du bureau.',
+    tooltipPositions: {
+      auto: 'Automatique',
+      above: 'Au-dessus',
+      below: 'En dessous',
+    },
     layoutMode: 'Disposition des icônes',
     layoutModeDescription: 'Choisissez comment les barres d’utilisation remplissent l’icône.',
     layoutModes: {

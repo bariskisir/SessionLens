@@ -124,6 +124,14 @@ const pt = {
   icon: {
     tooltipScale: 'Escala da informação de contexto',
     tooltipScaleDescription: 'Ajuste o tamanho da informação de contexto da bandeja.',
+    tooltipPosition: 'Posição da informação de contexto',
+    tooltipPositionDescription:
+      'Escolha se a informação de contexto abre acima ou abaixo do ícone. Automático segue a posição do painel da área de trabalho.',
+    tooltipPositions: {
+      auto: 'Automático',
+      above: 'Acima',
+      below: 'Abaixo',
+    },
     layoutMode: 'Disposição do ícone',
     layoutModeDescription: 'Escolha como as barras de utilização preenchem o ícone da bandeja.',
     layoutModes: {

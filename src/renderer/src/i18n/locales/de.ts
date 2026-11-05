@@ -124,6 +124,14 @@ const de = {
   icon: {
     tooltipScale: 'Tooltip-Skalierung',
     tooltipScaleDescription: 'Passen Sie die Größe des Tray-Tooltips an.',
+    tooltipPosition: 'Tooltip-Position',
+    tooltipPositionDescription:
+      'Wählen Sie, ob der Tray-Tooltip über oder unter dem Symbol geöffnet wird. Automatisch folgt der Position Ihrer Desktop-Leiste.',
+    tooltipPositions: {
+      auto: 'Automatisch',
+      above: 'Oben',
+      below: 'Unten',
+    },
     layoutMode: 'Symbol-Layout',
     layoutModeDescription: 'Wählen Sie, wie Nutzungsbalken das Tray-Symbol füllen.',
     layoutModes: {
