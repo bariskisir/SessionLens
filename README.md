@@ -15,6 +15,8 @@
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT license"></a>
 </p>
 
+https://github.com/user-attachments/assets/4736d6a2-4e08-4aac-b4cc-bba2c6ece371
+
 <p align="center">
   <img src="images/interface.png" alt="Session Lens interface" width="840">
   <img src="images/interface2.png" alt="Session Lens interface" width="840">
