@@ -6,7 +6,6 @@
 import {
   Activity,
   Bell,
-  Bot,
   Inbox,
   Info,
   MessageSquare,
@@ -23,7 +22,6 @@ import { setSettingsSection, type SettingsSection } from '@renderer/store/appSli
 import AboutSettingsSection from './sections/AboutSettingsSection'
 import GeneralSettingsSection from './sections/GeneralSettingsSection'
 import DisplaySettingsSection from './sections/DisplaySettingsSection'
-import DefaultModelsSettingsSection from './sections/DefaultModelsSettingsSection'
 import TooltipSettingsSection from './sections/TooltipSettingsSection'
 import IconSettingsSection from './sections/IconSettingsSection'
 import LoggingSettingsSection from './sections/LoggingSettingsSection'
@@ -55,7 +53,6 @@ const SettingsPage = (): React.JSX.Element => {
     { key: 'notifications', label: t('settings.notifications'), icon: <Bell size={17} /> },
     { key: 'tooltip', label: t('settings.tooltip'), icon: <MessageSquare size={17} /> },
     { key: 'icon', label: t('settings.icon'), icon: <Palette size={17} /> },
-    { key: 'defaultModels', label: t('settings.defaultModels'), icon: <Bot size={17} /> },
     { key: 'updates', label: t('settings.updates'), icon: <RefreshCw size={17} /> },
     { key: 'telemetry', label: t('settings.telemetry'), icon: <Activity size={17} /> },
     { key: 'logging', label: t('settings.logging'), icon: <ScrollText size={17} /> },
@@ -70,7 +67,6 @@ const SettingsPage = (): React.JSX.Element => {
     notifications: NotificationsSettingsSection,
     tooltip: TooltipSettingsSection,
     icon: IconSettingsSection,
-    defaultModels: DefaultModelsSettingsSection,
     updates: UpdatesSettingsSection,
     telemetry: TelemetrySettingsSection,
     logging: LoggingSettingsSection,

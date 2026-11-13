@@ -26,10 +26,6 @@ const fr = {
     tray: 'Zone de notification',
     tooltip: 'Infobulle',
     icon: 'Icône',
-    defaultModels: 'Modèles par défaut',
-    smallModelSelector: 'Sélecteur de petits modèles',
-    smallModelSelectorDescription:
-      'Fragments de noms de modèles séparés par des virgules, vérifiés de gauche à droite. Utilisé pour sélectionner le modèle le plus léger disponible lors du préchauffage des fenêtres après une réinitialisation de session.',
     providers: 'Fournisseurs',
     notifications: 'Notifications',
     remoteChannels: 'Canaux à distance',

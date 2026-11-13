@@ -26,10 +26,6 @@ const es = {
     tray: 'Área de notificación',
     tooltip: 'Información',
     icon: 'Icono',
-    defaultModels: 'Modelos predeterminados',
-    smallModelSelector: 'Selector de modelos pequeños',
-    smallModelSelectorDescription:
-      'Fragmentos de nombres de modelo separados por comas, comprobados de izquierda a derecha. Se usa para elegir el modelo más ligero disponible al calentar ventanas después de un reinicio de sesión.',
     providers: 'Proveedores',
     notifications: 'Notificaciones',
     remoteChannels: 'Canales remotos',

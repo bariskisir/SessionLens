@@ -38,7 +38,6 @@ const DEFAULT_ANTIGRAVITY_CLI_VERSION = '1.0.14'
 /** A single warm-window start request parameter payload. */
 export interface WindowStartRequest {
   providerName: string
-  smallModelSelector: string
   windowLabel: string
   windowSubLabel?: string | null
 }
@@ -46,8 +45,6 @@ export interface WindowStartRequest {
 /** Representation of a dynamic model option parsed from provider APIs. */
 interface DynamicModel {
   id: string
-  displayName: string
-  description: string
   hidden: boolean
   reasoningLevels: string[]
   recommended?: boolean
@@ -84,10 +81,10 @@ export default class WindowStartRequestSender {
   public async startAsync(request: WindowStartRequest): Promise<void> {
     switch (request.providerName.toLowerCase()) {
       case 'codex':
-        await this.startCodexAsync(request.smallModelSelector)
+        await this.startCodexAsync()
         return
       case 'claude':
-        await this.startClaudeAsync(request.smallModelSelector)
+        await this.startClaudeAsync()
         return
       case 'antigravity':
         await this.startAntigravityAsync(request)
@@ -97,12 +94,8 @@ export default class WindowStartRequestSender {
     }
   }
 
-  /**
-   * Sends a minimal completion request to OpenAI Codex.
-   *
-   * @param smallModelSelector - Preference filter for light model selection
-   */
-  private async startCodexAsync(smallModelSelector: string): Promise<void> {
+  /** Sends a minimal completion request to OpenAI Codex. */
+  private async startCodexAsync(): Promise<void> {
     const auth = await this.codexAuthReader.read()
     if (!auth) throw new ProviderError('Codex credentials were not found.')
     const version = await this.tryGetCodexVersionAsync()
@@ -113,7 +106,7 @@ export default class WindowStartRequestSender {
 
     const modelsDocument = (await getJsonWithHeaders(modelsUrl, headers)) as Record<string, unknown>
     const models = this.parseCodexModels(modelsDocument)
-    const model = this.selectLightest(models, smallModelSelector)
+    const model = this.firstUsableModel(models)
 
     const payload: Record<string, unknown> = {
       model: model.id,
@@ -144,12 +137,8 @@ export default class WindowStartRequestSender {
     this.logger.info('WindowStart', 'Codex warm-window request completed.', { model: model.id })
   }
 
-  /**
-   * Sends a minimal completion request to Anthropic Claude.
-   *
-   * @param smallModelSelector - Preference filter for light model selection
-   */
-  private async startClaudeAsync(smallModelSelector: string): Promise<void> {
+  /** Sends a minimal completion request to Anthropic Claude. */
+  private async startClaudeAsync(): Promise<void> {
     const auth = await this.claudeAuthReader.read()
     if (!auth) throw new ProviderError('Claude credentials were not found.')
 
@@ -157,7 +146,7 @@ export default class WindowStartRequestSender {
       CLAUDE_MODELS_ENDPOINT,
       this.claudeHeaders(auth.accessToken, CLAUDE_META_BETA, false),
     )) as Record<string, unknown>
-    const model = this.selectLightest(this.parseClaudeModels(modelsDocument), smallModelSelector)
+    const model = this.firstUsableModel(this.parseClaudeModels(modelsDocument))
 
     const payload: Record<string, unknown> = {
       model: model.id,
@@ -210,12 +199,8 @@ export default class WindowStartRequestSender {
     )) as Record<string, unknown>
     const models = this.parseAntigravityModels(modelsDocument)
     const model = request.windowSubLabel
-      ? this.selectAntigravityModelForBucket(
-          models,
-          request.smallModelSelector,
-          request.windowSubLabel,
-        )
-      : this.selectLightest(models, request.smallModelSelector)
+      ? this.selectAntigravityModelForBucket(models, request.windowSubLabel)
+      : this.firstUsableModel(models)
 
     const requestId = `sessionlens-${crypto.randomUUID().replace(/-/g, '')}`
     let withThinking = model.reasoningLevels.length > 0
@@ -458,8 +443,6 @@ export default class WindowStartRequestSender {
         const hidden = getBoolean(record, 'hidden') || getString(record, 'visibility') === 'hide'
         return {
           id,
-          displayName: getString(record, 'display_name') ?? id,
-          description: getString(record, 'description') ?? '',
           hidden,
           reasoningLevels: reasoning,
         }
@@ -487,8 +470,6 @@ export default class WindowStartRequestSender {
           effortCapability !== null && getBoolean(effortCapability, 'supported')
         return {
           id,
-          displayName: getString(record, 'display_name') ?? id,
-          description: '',
           hidden: false,
           reasoningLevels: supportsEffort ? ['low'] : [],
         }
@@ -515,8 +496,6 @@ export default class WindowStartRequestSender {
           typeof value === 'object' && value !== null ? (value as Record<string, unknown>) : {}
         return {
           id: name,
-          displayName: getString(record, 'displayName') ?? name,
-          description: '',
           hidden: false,
           reasoningLevels: getBoolean(record, 'supportsThinking') ? ['low'] : [],
           recommended: getBoolean(record, 'recommended'),
@@ -525,30 +504,28 @@ export default class WindowStartRequestSender {
   }
 
   /**
-   * Selects an Antigravity model corresponding to a specific quota bucket label.
+   * Selects the first Antigravity model corresponding to a specific quota bucket label.
    *
    * @param models - Available dynamic models
-   * @param smallModelSelector - Preference filter string
    * @param bucketLabel - Target quota bucket label
    * @returns Selected dynamic model instance
    */
   private selectAntigravityModelForBucket(
     models: DynamicModel[],
-    smallModelSelector: string,
     bucketLabel: string,
   ): DynamicModel {
     const bucketFamilies = new Set(
       this.modelFamilyWords(bucketLabel).map((word) => word.toLowerCase()),
     )
-    const candidates = models
+    const candidate = models
       .filter((model) => model.recommended)
-      .filter((model) => bucketFamilies.has(this.modelFamily(model.id)))
-    if (candidates.length === 0) {
+      .find((model) => bucketFamilies.has(this.modelFamily(model.id)))
+    if (!candidate) {
       throw new ProviderError(
         `Antigravity quota group '${bucketLabel}' did not contain a matching recommended quota-tracked model.`,
       )
     }
-    return this.selectLightest(candidates, smallModelSelector)
+    return candidate
   }
 
   /**
@@ -580,66 +557,20 @@ export default class WindowStartRequestSender {
   }
 
   /**
-   * Selects the lightest available model matching selector preferences.
+   * Selects the first usable model exactly as the provider returned it.
    *
-   * @param models - Candidate model list
-   * @param smallModelSelector - Preference order comma-separated string
-   * @returns Lightest matching model
+   * Warm-up requests are a fixed "2+2" prompt, so the lightest-model heuristics
+   * are unnecessary; any visible model can arm the session window.
+   *
+   * @param models - Candidate model list in provider order
+   * @returns First visible model
    */
-  private selectLightest(models: DynamicModel[], smallModelSelector: string): DynamicModel {
-    const visible = models.filter((model) => !model.hidden)
-    if (visible.length === 0) {
+  private firstUsableModel(models: DynamicModel[]): DynamicModel {
+    const model = models.find((candidate) => !candidate.hidden)
+    if (!model) {
       throw new ProviderError('The dynamic model catalog did not contain a usable model.')
     }
-    const selectors = smallModelSelector
-      .split(',')
-      .map((selector) => selector.trim())
-      .filter((selector) => selector !== '')
-    for (const selector of selectors) {
-      const match = this.orderByPreference(
-        visible.filter((model) =>
-          `${model.id} ${model.displayName} ${model.description}`
-            .toLowerCase()
-            .includes(selector.toLowerCase()),
-        ),
-      )[0]
-      if (match) return match
-    }
-    return this.orderByPreference(visible)[0] as DynamicModel
-  }
-
-  /**
-   * Sorts dynamic models by preference rank (recommended status, size score, reasoning).
-   *
-   * @param models - Models to sort
-   * @returns Sorted array of dynamic models
-   */
-  private orderByPreference(models: DynamicModel[]): DynamicModel[] {
-    return [...models].sort((left, right) => {
-      const recommended = Number(right.recommended ?? false) - Number(left.recommended ?? false)
-      if (recommended !== 0) return recommended
-      const size = this.modelSizeScore(left) - this.modelSizeScore(right)
-      if (size !== 0) return size
-      const reasoning =
-        Number(right.reasoningLevels.length > 0) - Number(left.reasoningLevels.length > 0)
-      if (reasoning !== 0) return reasoning
-      return left.id.localeCompare(right.id)
-    })
-  }
-
-  /**
-   * Computes a size score integer where lower numbers represent smaller/faster models.
-   *
-   * @param model - Model definition object
-   * @returns Numeric score (0 for extra-low, 1 for nano/mini/haiku, 2 for low, 3 for standard)
-   */
-  private modelSizeScore(model: DynamicModel): number {
-    const value = `${model.id} ${model.displayName}`
-    if (value.toLowerCase().includes('extra-low')) return 0
-    if (/nano|mini|haiku|lite/i.test(value)) {
-      return 1
-    }
-    return value.toLowerCase().includes('low') ? 2 : 3
+    return model
   }
 
   /**

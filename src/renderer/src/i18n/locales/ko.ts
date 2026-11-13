@@ -26,10 +26,6 @@ const ko = {
     tray: '트레이',
     tooltip: '도구 설명',
     icon: '아이콘',
-    defaultModels: '기본 모델',
-    smallModelSelector: '소형 모델 선택기',
-    smallModelSelectorDescription:
-      '쉼표로 구분된 모델 이름 조각으로, 왼쪽에서 오른쪽으로 확인됩니다. 세션 재설정 후 창을 워밍업할 때 사용 가능한 가장 가벼운 모델을 선택하는 데 사용됩니다.',
     providers: '공급자',
     notifications: '알림',
     remoteChannels: '원격 채널',

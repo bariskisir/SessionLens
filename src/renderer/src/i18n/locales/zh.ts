@@ -26,10 +26,6 @@ const zh = {
     tray: '托盘',
     tooltip: '提示框',
     icon: '图标',
-    defaultModels: '默认模型',
-    smallModelSelector: '小型模型选择器',
-    smallModelSelectorDescription:
-      '以逗号分隔的模型名称片段，从左到右检查。用于在会话重置后预热窗口时选择最轻量的可用模型。',
     providers: '提供商',
     notifications: '通知',
     remoteChannels: '远程渠道',

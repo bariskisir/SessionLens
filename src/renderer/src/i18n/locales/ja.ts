@@ -26,10 +26,6 @@ const ja = {
     tray: 'トレイ',
     tooltip: 'ツールチップ',
     icon: 'アイコン',
-    defaultModels: 'デフォルトモデル',
-    smallModelSelector: '小モデルセレクター',
-    smallModelSelectorDescription:
-      'カンマ区切りのモデル名フラグメント。左から右にチェックされます。セッションリセット後のウィンドウのウォームアップ時に、利用可能な最も軽量なモデルを選択するために使用されます。',
     providers: 'プロバイダー',
     notifications: '通知',
     remoteChannels: 'リモートチャンネル',

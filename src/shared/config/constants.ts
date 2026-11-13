@@ -23,8 +23,6 @@ export const TOOLTIP_POSITIONS = ['auto', 'above', 'below'] as const
 
 export const PROVIDER_TYPES = ['oauth', 'apiKey'] as const
 
-export const DEFAULT_SMALL_MODEL_SELECTOR = 'nano,mini,haiku,lite,flash,oss'
-
 export const REFRESH_MAX_MINUTES = 1440
 
 export const VISUAL_SCALE_LIMITS = { min: 50, max: 1000, default: 110 } as const

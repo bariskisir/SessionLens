@@ -26,10 +26,6 @@ const pt = {
     tray: 'Área de notificação',
     tooltip: 'Informação de contexto',
     icon: 'Ícone',
-    defaultModels: 'Modelos predefinidos',
-    smallModelSelector: 'Seletor de modelos pequenos',
-    smallModelSelectorDescription:
-      'Fragmentos de nomes de modelos separados por vírgulas, verificados da esquerda para a direita. Usado para selecionar o modelo mais leve disponível ao aquecer janelas após um reinício de sessão.',
     providers: 'Fornecedores',
     notifications: 'Notificações',
     remoteChannels: 'Canais remotos',

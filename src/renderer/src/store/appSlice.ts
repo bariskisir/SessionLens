@@ -16,7 +16,6 @@ export type SettingsSection =
   | 'tray'
   | 'tooltip'
   | 'icon'
-  | 'defaultModels'
   | 'providers'
   | 'notifications'
   | 'updates'

@@ -252,9 +252,11 @@ export default class AntigravityProvider extends BaseOAuthProvider<AntigravityAu
         const usedPercent = (1 - remainingFraction) * 100
         const resetTimeRaw = getString(bucketRecord, 'resetTime')
         let resetText: string | null = null
+        let resetAt: string | null = null
         if (resetTimeRaw) {
           const parsed = new Date(resetTimeRaw)
           if (!Number.isNaN(parsed.getTime())) {
+            resetAt = parsed.toISOString()
             resetText = resetDuration(parsed.getTime() - now.getTime())
           }
         }
@@ -265,6 +267,7 @@ export default class AntigravityProvider extends BaseOAuthProvider<AntigravityAu
             label: windowLabel || groupName,
             usedPercent: Math.min(100, Math.max(0, usedPercent)),
             resetText,
+            resetAt,
             subLabel: windowLabel && groupName ? groupName : null,
           },
         })

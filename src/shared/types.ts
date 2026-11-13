@@ -17,7 +17,6 @@ export {
   ICON_LAYOUT_MODES,
   TOOLTIP_POSITIONS,
   PROVIDER_TYPES,
-  DEFAULT_SMALL_MODEL_SELECTOR,
   REFRESH_MAX_MINUTES,
   VISUAL_SCALE_LIMITS,
 } from './config/constants'
@@ -96,11 +95,6 @@ export interface VisualSettings {
   iconLayout: TrayIconLayoutSettings
 }
 
-/** Small-model selector used to warm windows after a reset. */
-export interface ModelSettings {
-  smallModelSelector: string
-}
-
 /** A single persisted provider entry reconciled against the registered catalog. */
 export interface ProviderSettings {
   name: string
@@ -147,7 +141,6 @@ export interface AppSettings {
   notification: NotificationSettings
   visual: VisualSettings
   providers: ProviderSettings[]
-  models: ModelSettings
 }
 
 export type AppSettingsPatch = {

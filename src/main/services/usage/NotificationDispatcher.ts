@@ -48,19 +48,21 @@ export default class NotificationDispatcher {
     emitNative: (level: NotificationLevel, message: string) => void,
   ): Promise<void> {
     const notification = settings.notification
-    if (!notification.enabled) return
 
+    // Keep the notifier baseline current even while notifications are disabled,
+    // otherwise re-enabling them later could compare against stale usage data.
     const items = this.thresholds.evaluate(windows, notification)
-    if (items.length === 0) return
+    if (!notification.enabled || items.length === 0) return
 
     for (const level of SEVERITY_ORDER) {
-      const lines = items.filter((item) => item.level === level).map((item) => item.message)
-      if (lines.length === 0) continue
+      const levelItems = items.filter((item) => item.level === level)
+      if (levelItems.length === 0) continue
 
-      const message = formatNotification(level, lines.join('\n'))
+      const message = formatNotification(level, levelItems.map((item) => item.message).join('\n'))
       this.logger.info('NotificationDispatcher', 'Usage notification dispatched.', {
         level,
-        itemCount: lines.length,
+        itemCount: levelItems.length,
+        windows: levelItems.map((item) => item.window),
       })
       emitNative(level, message)
       await this.sendRemoteAsync(message, settings)

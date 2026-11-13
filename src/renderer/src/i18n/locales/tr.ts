@@ -26,7 +26,6 @@ const tr = {
     tray: 'Sistem Tepsisi',
     tooltip: 'İpucu',
     icon: 'Simge',
-    defaultModels: 'Varsayılan modeller',
     providers: 'Sağlayıcılar',
     notifications: 'Bildirimler',
     remoteChannels: 'Uzak kanallar',
@@ -34,9 +33,6 @@ const tr = {
     telemetry: 'Telemetri',
     logging: 'Günlükleme',
     about: 'Hakkında',
-    smallModelSelector: 'Küçük model seçici',
-    smallModelSelectorDescription:
-      'Soldan sağa denenmiş virgülle ayrılmış model adı parçaları. Oturum sıfırlandıktan sonra pencereleri ısıtırken en hafif kullanılabilir modeli seçmek için kullanılır.',
     interfaceLanguage: 'Arayüz dili',
     interfaceLanguageDescription: 'Uygulamada kullanılan dili seçin.',
     timeFormat: 'Saat biçimi',

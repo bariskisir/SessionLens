@@ -26,10 +26,6 @@ const de = {
     tray: 'Infobereich',
     tooltip: 'Tooltip',
     icon: 'Symbol',
-    defaultModels: 'Standardmodelle',
-    smallModelSelector: 'Kleines Modell auswählen',
-    smallModelSelectorDescription:
-      'Durch Kommas getrennte Modellnamen-Fragmente, von links nach rechts geprüft. Wird verwendet, um nach einem Sitzungs-Reset das leichteste verfügbare Modell zum Aufwärmen von Fenstern auszuwählen.',
     providers: 'Anbieter',
     notifications: 'Benachrichtigungen',
     remoteChannels: 'Remote-Kanäle',

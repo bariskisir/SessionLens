@@ -3,7 +3,7 @@
  * @description Default application settings and notification configuration.
  */
 
-import { PAGE_ZOOM_LIMITS, VISUAL_SCALE_LIMITS, DEFAULT_SMALL_MODEL_SELECTOR } from './constants'
+import { PAGE_ZOOM_LIMITS, VISUAL_SCALE_LIMITS } from './constants'
 import type { AppSettings, NotificationSettings } from '../types'
 
 export const DEFAULT_NOTIFICATION: NotificationSettings = {
@@ -38,5 +38,4 @@ export const DEFAULT_SETTINGS: AppSettings = {
     iconLayout: { mode: 'auto', bars: {} },
   },
   providers: [],
-  models: { smallModelSelector: DEFAULT_SMALL_MODEL_SELECTOR },
 }

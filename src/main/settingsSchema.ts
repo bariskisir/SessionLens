@@ -5,7 +5,6 @@
 
 import {
   APP_LOCALES,
-  DEFAULT_SMALL_MODEL_SELECTOR,
   DEFAULT_SETTINGS,
   ICON_LAYOUT_MODES,
   LOG_LEVELS,
@@ -73,11 +72,6 @@ const visualSettingsSchema = z.object({
   iconLayout: trayIconLayoutSchema,
 })
 
-/** Zod schema for model selection preferences. */
-const modelSettingsSchema = z.object({
-  smallModelSelector: z.string().max(300),
-})
-
 /** Zod schema for individual provider settings. */
 const providerSettingsSchema = z.object({
   name: z.string().trim().min(1).max(100),
@@ -111,7 +105,6 @@ const settingsFieldsSchema = z.object({
   notification: notificationSettingsSchema,
   visual: visualSettingsSchema,
   providers: z.array(providerSettingsSchema),
-  models: modelSettingsSchema,
 })
 
 /** Full Zod schema including refinement rules for inter-field constraints. */
@@ -339,9 +332,6 @@ export const normalizeSettings = (
       position: normalizeTooltipPosition(settings.visual.position),
       iconLayout: normalizeIconLayout(settings.visual.iconLayout),
     },
-    models: {
-      smallModelSelector: settings.models.smallModelSelector.trim() || DEFAULT_SMALL_MODEL_SELECTOR,
-    },
     providers: mergeRegisteredProviders(settings.providers),
   }
 }
@@ -379,11 +369,6 @@ export const normalizeSettingsPatch = (patch: AppSettingsPatch): AppSettingsPatc
       iconLayout: normalizeIconLayout(
         patch.visual.iconLayout ?? DEFAULT_SETTINGS.visual.iconLayout,
       ),
-    }
-  }
-  if (patch.models !== undefined) {
-    normalized.models = {
-      smallModelSelector: patch.models.smallModelSelector?.trim() || DEFAULT_SMALL_MODEL_SELECTOR,
     }
   }
   if (patch.providers !== undefined) {

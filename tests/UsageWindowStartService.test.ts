@@ -41,7 +41,6 @@ const settings = (provider: Partial<AppSettings['providers'][number]>): AppSetti
         ...provider,
       },
     ],
-    models: { smallModelSelector: 'nano,mini,haiku' },
   }) as AppSettings
 
 describe('UsageWindowStartService', () => {
@@ -73,13 +72,12 @@ describe('UsageWindowStartService', () => {
     expect(started).toHaveBeenCalledTimes(1)
     expect(started).toHaveBeenCalledWith({
       providerName: 'codex',
-      smallModelSelector: 'nano,mini,haiku',
       windowLabel: 'Session',
       windowSubLabel: null,
     })
   })
 
-  it('warns when the reset timestamp moves later on an unused session', async () => {
+  it('warms when the reset timestamp moves later on an unused session', async () => {
     const { sender, started } = createSender()
     const service = new UsageWindowStartService(sender, createLogger())
 
@@ -137,5 +135,78 @@ describe('UsageWindowStartService', () => {
     await service.observeAsync([window({ usedPercent: 0 })], settings({}))
 
     expect(started).toHaveBeenCalledTimes(2)
+  })
+
+  it('does not warm on tiny low-usage fluctuations', async () => {
+    const { sender, started } = createSender()
+    const service = new UsageWindowStartService(sender, createLogger())
+
+    await service.observeAsync(
+      [window({ usedPercent: 4.5, resetAt: '2026-01-01T00:00:00Z' })],
+      settings({}),
+    )
+    await service.observeAsync(
+      [window({ usedPercent: 4.2, resetAt: '2026-01-01T00:00:00Z' })],
+      settings({}),
+    )
+    await service.observeAsync(
+      [window({ usedPercent: 4.4, resetAt: '2026-01-01T00:00:00Z' })],
+      settings({}),
+    )
+
+    expect(started).not.toHaveBeenCalled()
+  })
+
+  it('does not warm twice while the window stays unused', async () => {
+    const { sender, started } = createSender()
+    const service = new UsageWindowStartService(sender, createLogger())
+
+    await service.observeAsync(
+      [window({ usedPercent: 0, resetAt: '2026-01-01T00:00:00Z' })],
+      settings({}),
+    )
+    await service.observeAsync(
+      [window({ usedPercent: 0, resetAt: '2026-01-01T00:00:00Z' })],
+      settings({}),
+    )
+    await service.observeAsync(
+      [window({ usedPercent: 0, resetAt: '2026-01-01T00:00:00Z' })],
+      settings({}),
+    )
+
+    expect(started).toHaveBeenCalledTimes(1)
+  })
+
+  it('ignores reset timestamp drift below the tolerance', async () => {
+    const { sender, started } = createSender()
+    const service = new UsageWindowStartService(sender, createLogger())
+
+    await service.observeAsync(
+      [window({ usedPercent: 2, resetAt: '2026-01-01T00:00:00Z' })],
+      settings({}),
+    )
+    await service.observeAsync(
+      [window({ usedPercent: 2, resetAt: '2026-01-01T00:00:30Z' })],
+      settings({}),
+    )
+
+    expect(started).not.toHaveBeenCalled()
+
+    await service.observeAsync(
+      [window({ usedPercent: 2, resetAt: '2026-01-01T00:02:00Z' })],
+      settings({}),
+    )
+
+    expect(started).toHaveBeenCalledTimes(1)
+  })
+
+  it('does not warm when usage drops but stays above the low threshold', async () => {
+    const { sender, started } = createSender()
+    const service = new UsageWindowStartService(sender, createLogger())
+
+    await service.observeAsync([window({ usedPercent: 60 })], settings({}))
+    await service.observeAsync([window({ usedPercent: 20 })], settings({}))
+
+    expect(started).not.toHaveBeenCalled()
   })
 })

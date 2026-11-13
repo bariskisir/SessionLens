@@ -9,6 +9,10 @@ import type WindowStartRequestSender from './WindowStartRequestSender'
 
 /** Tolerance threshold in milliseconds for reset timestamp drift. */
 const RESET_DEADLINE_DRIFT_TOLERANCE_MS = 60_000
+/** Usage at or below this percentage is treated as an unused session window. */
+const LOW_USAGE_THRESHOLD_PERCENT = 5
+/** Minimum drop in percentage points that can confirm a usage reset. */
+const RESET_USAGE_DROP_PERCENT = 5
 /** Supported provider IDs for window warming functionality. */
 const SUPPORTED_PROVIDERS = new Set(['codex', 'claude', 'antigravity'])
 
@@ -71,11 +75,6 @@ export default class UsageWindowStartService {
       if (!SUPPORTED_PROVIDERS.has((provider.id ?? provider.name).toLowerCase())) continue
       enabledProviders.set((provider.id ?? provider.name).toLowerCase(), provider)
     }
-    const smallModelSelector =
-      settings.models?.smallModelSelector.trim() === ''
-        ? 'nano,mini,haiku,lite,flash,oss'
-        : (settings.models?.smallModelSelector ?? 'nano,mini,haiku,lite,flash,oss')
-
     if (this.running) return
     this.running = true
     try {
@@ -137,18 +136,24 @@ export default class UsageWindowStartService {
             observation.lowUsageWarmResetAt = null
           }
 
-          const usageReset = current.usedPercent < observation.usedPercent
-          if (usageReset && current.usedPercent < 5) {
+          const usageReset =
+            current.usedPercent <= observation.usedPercent - RESET_USAGE_DROP_PERCENT &&
+            observation.usedPercent >= RESET_USAGE_DROP_PERCENT &&
+            current.usedPercent < LOW_USAGE_THRESHOLD_PERCENT
+          if (usageReset) {
             observation.lowUsageWarmTriggered = true
           }
 
-          if (current.usedPercent >= 5) {
+          if (current.usedPercent >= LOW_USAGE_THRESHOLD_PERCENT) {
             observation.lowUsageWarmTriggered = false
             observation.lowUsageWarmResetAt = null
           } else if (current.resetAt != null && observation.resetAt != null) {
             const resetAtMs = new Date(current.resetAt).getTime()
             const previousResetAtMs = new Date(observation.resetAt).getTime()
-            if (resetAtMs > previousResetAtMs && !observation.lowUsageWarmTriggered) {
+            if (
+              resetAtMs > previousResetAtMs + RESET_DEADLINE_DRIFT_TOLERANCE_MS &&
+              !observation.lowUsageWarmTriggered
+            ) {
               observation.lowUsageWarmTriggered = true
               observation.isMovingReset = true
             }
@@ -176,7 +181,6 @@ export default class UsageWindowStartService {
           try {
             await this.sender.startAsync({
               providerName,
-              smallModelSelector,
               windowLabel: current.label,
               windowSubLabel: current.subLabel ?? null,
             })

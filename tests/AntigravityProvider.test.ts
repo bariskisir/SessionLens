@@ -139,12 +139,16 @@ describe('AntigravityProvider', () => {
     ).buildResult(rawUsage, auth, new Date()) as {
       providerName: string
       plan: string | null
-      windows: Array<{ label: string; usedPercent: number }>
+      windows: Array<{ label: string; usedPercent: number; resetAt: string | null }>
     }
 
     expect(result.providerName).toBe('Antigravity')
     expect(result.plan).toBe('Pro')
     expect(result.windows.length).toBe(3)
+    expect(result.windows.every((window) => window.resetAt !== null)).toBe(true)
+    expect(result.windows.find((window) => window.label === 'Weekly')?.resetAt).toBe(
+      sampleQuotaResponse.groups[0]?.buckets[0]?.resetTime,
+    )
   })
 
   it('resolves Free plan when paidTier is absent and currentTier is free-tier', async () => {

@@ -26,7 +26,6 @@ const en = {
     tray: 'Tray',
     tooltip: 'Tooltip',
     icon: 'Icon',
-    defaultModels: 'Default models',
     providers: 'Providers',
     notifications: 'Notifications',
     remoteChannels: 'Remote channels',
@@ -34,9 +33,6 @@ const en = {
     telemetry: 'Telemetry',
     logging: 'Logging',
     about: 'About',
-    smallModelSelector: 'Small model selector',
-    smallModelSelectorDescription:
-      'Comma-separated model name fragments, checked from left to right. Used to select the lightest available model when warming windows after a session reset.',
     interfaceLanguage: 'Interface language',
     interfaceLanguageDescription: 'Choose the language used by the application.',
     timeFormat: 'Time format',
